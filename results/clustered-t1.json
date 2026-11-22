@@ -1,0 +1,52 @@
+{
+  "initial": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "rounds": [
+    {
+      "events": [
+        {
+          "agent": 6,
+          "sources": [
+            5
+          ]
+        },
+        {
+          "agent": 9,
+          "sources": [
+            0
+          ]
+        }
+      ],
+      "round": 1
+    },
+    {
+      "events": [
+        {
+          "agent": 7,
+          "sources": [
+            6
+          ]
+        },
+        {
+          "agent": 8,
+          "sources": [
+            9
+          ]
+        }
+      ],
+      "round": 2
+    },
+    {
+      "events": [],
+      "round": 3
+    }
+  ],
+  "schema": "brandtopia.awareness.v0.1",
+  "threshold": 1
+}
