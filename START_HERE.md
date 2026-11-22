@@ -1,18 +1,42 @@
-# 从这里开始
+# 开始参与 Brandtopia
 
-## 三分钟读懂 Brandtopia
+欢迎加入。这里是一项持续推进的研究，涉及认知科学、行为经济学、复杂系统、营销科学、因果推断与多主体模拟。
 
-1. [北极星](docs/theory/north-star.md)给出研究问题和目前的边界。
-2. [实验 15](docs/experiments/abm-001-information-diffusion.md)展示一个可复跑的结果。同样有 6 人知晓，换一下这 6 人在关系网络中的位置，最后可能是 6 人或 10 人知晓。
-3. [假设清单](docs/theory/hypotheses.md)列出可以推翻的命题。带着你关心的现实观察去看哪条预测最容易检验。
+## 如果你第一次接触这个项目
 
-## 接手工作
+**先问问题，再看实验。** Brandtopia 想知道：能否从个体如何接收信息、更新信念、作出选择出发，逐步解释和预测群体行为？当现实案例增加时，背后的机制能否保持相对简洁？
 
-| 来做什么 | 先读 | 交付落点 |
-| --- | --- | --- |
-| 讨论理论或挑战假设 | [框架](docs/theory/framework.md)、[词汇](docs/theory/glossary.md)、[假设](docs/theory/hypotheses.md) | 更新相关假设，说明预测、反例和来源 |
-| 实现或复跑实验 | [AGENTS.md](AGENTS.md)、[架构](docs/models/architecture.md)、[参数](docs/models/parameter-register.md)、[核验与验证](docs/models/verification-validation.md) | 在[实验索引](docs/experiments/index.md)登记，并链接代码、配置、日志和结论 |
-| 核对一句结论 | [主张与局限](docs/evidence/claims-and-limitations.md)、[来源登记](docs/evidence/source-register.md) | 修正主张的适用条件、证据级别或出处 |
-| 提交资料或研究改动 | [协作](docs/governance/contributing.md)、[隐私](docs/governance/privacy.md) | 在评审中说明可分发范围和可复核依据 |
+建议按这个顺序阅读：
 
-理论可以继续在原 Chat 里探索。落实成研究基线时，由接手的 Agent 提炼本次可落地的假设或问题、读取当前仓库、执行并记录结果。回到 Chat 时，可以按实验编号和修订版本读取成果。具体读取权限取决于当前会话的 GitHub 连接。见[协作约定](docs/governance/contributing.md)。
+1. [README](README.md)：研究要解决什么、为什么重要。
+2. [研究历程](docs/theory/research-journey.md)：从心理史学、消费者内部世界模型到社会共识与 ABM 的思想发展。
+3. [理论框架](docs/theory/framework.md)：IPO、B=MAP、动态信念与群体信息状态怎样协作。
+4. [研究假设](docs/theory/hypotheses.md)：目前哪些命题可以被证伪。
+
+看完这些，再根据兴趣选择深入理论或工程。
+
+## 如果你想参与理论研究
+
+从一个真实现象出发，先说清**看到什么**，再提出至少一种可能机制，以及一个能把它与其他解释区分开的预测。欢迎提出反例和竞争性框架。
+
+请不要把聊天里为演示构造的概率、阈值、曲线等当成消费者实测规律。研究主张必须标注证据等级，参见 [主张与局限](docs/evidence/claims-and-limitations.md)。
+
+## 如果你想参与计算研究
+
+先读 [AGENTS.md](AGENTS.md)、[模型架构](docs/models/architecture.md)、[参数登记](docs/models/parameter-register.md) 和 [核验与验证](docs/models/verification-validation.md)。
+
+当前的 [实验档案](docs/experiments/index.md) 记录已有计算基础设施。具体人数、网络拓扑、命令、测试和日志保留在相应实验页面。新实验应当说明所测试的机制、与什么基线比较、如何复现，以及什么结果会推翻判断。
+
+## 如果你是 AI Agent
+
+先读取 [AGENTS.md](AGENTS.md) 与仓库当前研究基线，再根据任务读取对应的理论、模型或实验记录。不要仅根据最新聊天自由改写已经冻结的规则；任何修改都需要记录来源、影响范围和验证状态。
+
+## 如何提出贡献
+
+可以提出研究问题、文献证据、反例、可复现实验或模型改动。建议通过 Issue 讨论；对正式文档或代码的修订使用分支与 Pull Request，保留不同判断及其证据，避免静默覆盖。
+
+仓库目前为 **Public**。请不要提交个人 Agent 原始痕迹、家庭隐私、未经授权的客户数据、内部商业资料或其他受限制内容。参见 [公开资料边界](docs/governance/privacy.md) 和 [协作约定](docs/governance/contributing.md)。
+
+---
+
+**先理解问题，允许不同解释并存；再让理论与计算实验相互检验。**
