@@ -1,0 +1,137 @@
+<div id="three-person-random-order" lang="zh-CN">
+  <style>
+    #three-person-random-order { color: var(--foreground); display: grid; gap: 18px; }
+    #three-person-random-order .random-heading { padding-right: 96px; }
+    #three-person-random-order .random-heading h3 { margin: 0 0 6px; }
+    #three-person-random-order .random-world { display: grid; gap: 18px; padding: 8px 0; }
+    #three-person-random-order .random-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    #three-person-random-order .random-agents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    #three-person-random-order .random-agent { display: grid; justify-items: center; align-content: start; gap: 8px; min-width: 0; text-align: center; }
+    #three-person-random-order .random-mark { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--muted); color: var(--foreground); font-weight: 500; }
+    #three-person-random-order .random-agent[data-active="true"] .random-mark { background: color-mix(in srgb, var(--viz-series-1) 22%, transparent); }
+    #three-person-random-order .random-state { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    #three-person-random-order .random-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted-foreground); }
+    #three-person-random-order .random-agent[data-active="true"] .random-dot { background: var(--viz-series-1); }
+    #three-person-random-order .random-detail { min-height: 36px; overflow-wrap: anywhere; }
+    #three-person-random-order .random-results { display: grid; gap: 10px; }
+  </style>
+
+  <div class="random-heading">
+    <h3>谁先行动，交给抽签</h3>
+    <div class="text-small text-muted">每次起点：甲乙参加 · 丙未参加</div>
+  </div>
+
+  <div class="random-world" role="group" aria-label="最近一次实验的三人状态">
+    <div class="random-status tabular-nums">
+      <span data-trial>起点</span>
+      <span data-total>2 / 3 人参加</span>
+    </div>
+    <div class="random-agents">
+      <div class="random-agent" data-agent="0" data-active="true">
+        <div class="random-mark">甲</div>
+        <div class="random-state"><span class="random-dot" aria-hidden="true"></span><span data-state>参加</span></div>
+        <span class="text-small text-muted">始终参加</span>
+      </div>
+      <div class="random-agent" data-agent="1" data-active="true">
+        <div class="random-mark">乙</div>
+        <div class="random-state"><span class="random-dot" aria-hidden="true"></span><span data-state>参加</span></div>
+        <span class="text-small text-muted">需另 2 人</span>
+      </div>
+      <div class="random-agent" data-agent="2" data-active="false">
+        <div class="random-mark">丙</div>
+        <div class="random-state"><span class="random-dot" aria-hidden="true"></span><span data-state>未参加</span></div>
+        <span class="text-small text-muted">需另 2 人</span>
+      </div>
+    </div>
+    <div class="text-small" data-order>抽签概率：乙先 50% · 丙先 50%</div>
+  </div>
+
+  <div class="viz-controls" role="group" aria-label="从固定起点开始独立实验">
+    <button type="button" class="btn btn-primary" data-run="1">抽签运行一次</button>
+    <button type="button" class="btn" data-run="20">独立运行 20 次</button>
+  </div>
+
+  <div class="random-detail text-small" role="status" aria-live="polite" aria-atomic="true" data-detail>等待抽签</div>
+
+  <div class="random-results" role="group" aria-label="累计独立实验的结果">
+    <div class="random-status">
+      <span class="tabular-nums" data-trials>累计 0 次独立实验</span>
+      <span class="text-small text-muted">实际占比</span>
+    </div>
+    <div class="viz-row tabular-nums">
+      <span data-solo>只有甲：0 次 · —</span>
+      <span data-all>三人参加：0 次 · —</span>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('three-person-random-order');
+      const agents = Array.from(root.querySelectorAll('[data-agent]'));
+      const buttons = Array.from(root.querySelectorAll('[data-run]'));
+      const trialLabel = root.querySelector('[data-trial]');
+      const totalLabel = root.querySelector('[data-total]');
+      const orderLabel = root.querySelector('[data-order]');
+      const detail = root.querySelector('[data-detail]');
+      const trialsLabel = root.querySelector('[data-trials]');
+      const soloLabel = root.querySelector('[data-solo]');
+      const allLabel = root.querySelector('[data-all]');
+      const names = ['甲', '乙', '丙'];
+      let trials = 0;
+      let solo = 0;
+      let all = 0;
+
+      function runOnce() {
+        const state = [true, true, false];
+        const order = Math.random() < 0.5 ? [1, 2] : [2, 1];
+        const reasons = [];
+        order.forEach(index => {
+          const others = state.reduce((count, active, otherIndex) => count + Number(active && otherIndex !== index), 0);
+          const before = state[index];
+          const after = others >= 2;
+          const action = after ? (before ? '留下' : '加入') : (before ? '退出' : '等待');
+          reasons.push(names[index] + '看到' + others + '人，' + action);
+          state[index] = after;
+        });
+        const total = state.filter(Boolean).length;
+        trials += 1;
+        if (total === 1) solo += 1;
+        if (total === 3) all += 1;
+        return { state, order, reasons, total };
+      }
+
+      function render(result) {
+        agents.forEach((agent, index) => {
+          agent.dataset.active = String(result.state[index]);
+          agent.querySelector('[data-state]').textContent = result.state[index] ? '参加' : '未参加';
+          agent.setAttribute('aria-label', names[index] + '：' + (result.state[index] ? '参加' : '未参加'));
+        });
+        trialLabel.textContent = '第 ' + trials + ' 次结局';
+        totalLabel.textContent = result.total + ' / 3 人参加';
+        orderLabel.textContent = '本次顺序：' + result.order.map(index => names[index]).join(' → ');
+        detail.textContent = '第 ' + trials + ' 次：' + result.reasons.join('；') + '。';
+        trialsLabel.textContent = '累计 ' + trials + ' 次独立实验';
+        soloLabel.textContent = '只有甲：' + solo + ' 次 · ' + (100 * solo / trials).toFixed(1) + '%';
+        allLabel.textContent = '三人参加：' + all + ' 次 · ' + (100 * all / trials).toFixed(1) + '%';
+        root.dataset.state = result.state.map(Number).join('');
+        root.dataset.trials = String(trials);
+        root.dataset.solo = String(solo);
+        root.dataset.all = String(all);
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const count = Number(button.dataset.run);
+          let result;
+          for (let index = 0; index < count; index += 1) result = runOnce();
+          render(result);
+        });
+      });
+
+      root.dataset.state = '110';
+      root.dataset.trials = '0';
+      root.dataset.solo = '0';
+      root.dataset.all = '0';
+    })();
+  </script>
+</div>

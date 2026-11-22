@@ -1,0 +1,280 @@
+<section id="commute-recovery-curves" lang="zh-CN">
+  <style>
+    #commute-recovery-curves { position: relative; display: grid; gap: 14px; color: var(--foreground); }
+    #commute-recovery-curves .recovery-heading { padding-right: 94px; }
+    #commute-recovery-curves .recovery-heading h3 { margin: 0 0 6px; }
+    #commute-recovery-curves .recovery-values { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+    #commute-recovery-curves .recovery-figure { margin: 0; min-width: 0; }
+    #commute-recovery-curves .recovery-chart { display: block; width: 100%; overflow: visible; }
+    #commute-recovery-curves .recovery-chart [hidden] { display: none; }
+    #commute-recovery-curves .recovery-chart text { fill: var(--foreground); font-size: 12px; font-weight: 400; }
+    #commute-recovery-curves .recovery-chart .recovery-grid { stroke: var(--border); stroke-width: 1; }
+    #commute-recovery-curves .recovery-chart .recovery-baseline { stroke: var(--muted-foreground); stroke-width: 1.4; stroke-dasharray: 5 5; }
+    #commute-recovery-curves .recovery-chart .recovery-ceiling { stroke: var(--viz-series-1); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: .6; }
+    #commute-recovery-curves .recovery-chart .recovery-curve { fill: none; stroke: var(--viz-series-1); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+    #commute-recovery-curves .recovery-chart .recovery-dot { fill: var(--viz-series-1); }
+    #commute-recovery-curves .recovery-chart .recovery-guide { stroke: var(--muted-foreground); stroke-width: 1; }
+    #commute-recovery-curves .recovery-chart .recovery-hit { fill: transparent; touch-action: pan-y; }
+    #commute-recovery-curves .recovery-tooltip { position: absolute; z-index: 2; pointer-events: none; background: var(--popover); color: var(--popover-foreground); padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; max-width: calc(100% - 16px); }
+    #commute-recovery-curves .recovery-tooltip[hidden] { display: none; }
+  </style>
+
+  <header class="recovery-heading">
+    <h3>复通后的客流</h3>
+    <div class="text-small text-muted">演示模型 · 原站 1,000 人，每人每天通勤一次</div>
+    <div class="text-small text-muted">停运期间，每天接受替代方案的概率固定为 10%</div>
+  </header>
+
+  <div class="viz-controls" role="group" aria-label="调整停运时长与复通后的回流比例">
+    <label class="form-label" for="recovery-duration">
+      <span>停运时长：<output class="tabular-nums" id="recovery-duration-value" for="recovery-duration">2 天</output></span>
+      <input class="form-range" id="recovery-duration" type="range" min="1" max="7" step="1" value="2" aria-valuetext="2 天">
+    </label>
+    <label class="form-label" for="recovery-return-rate">
+      <span>每日剩余者回流比例：<output class="tabular-nums" id="recovery-rate-value" for="recovery-return-rate">50%</output></span>
+      <input class="form-range" id="recovery-return-rate" type="range" min="10" max="90" step="10" value="50" aria-valuetext="剩余可回流者的 50%">
+    </label>
+  </div>
+
+  <div class="recovery-values text-small tabular-nums">
+    <span>预计留用新方案：<output data-adopters>190</output> 人</span>
+    <span>最终可回流：<output data-ceiling>810</output> 人</span>
+  </div>
+
+  <figure class="recovery-figure">
+    <div class="text-small text-muted">圆点：逐日预期 · 连线：走势示意</div>
+    <svg class="recovery-chart" role="img" aria-labelledby="recovery-chart-title recovery-chart-desc" preserveAspectRatio="xMidYMid meet">
+      <title id="recovery-chart-title">停运时长与回流比例怎样改变复通后的原站客流</title>
+      <desc id="recovery-chart-desc">演示数据，非伦敦实测。横轴从复通时刻开始，零时刻尚未回流。每个点表示一天后的预期客流。接受新方案的人在模型期间继续使用新方案；回到原站的人每天继续使用原站。</desc>
+      <defs><clipPath id="recovery-chart-clip"><rect data-clip-frame></rect></clipPath></defs>
+      <g data-chart-grid></g>
+      <rect data-chart-frame fill="none" stroke="var(--border)" stroke-width="1"></rect>
+      <g clip-path="url(#recovery-chart-clip)">
+        <line class="recovery-baseline" data-baseline></line>
+        <line class="recovery-ceiling" data-limit-line></line>
+        <path class="recovery-curve" data-recovery-path></path>
+        <g data-day-markers></g>
+        <line class="recovery-guide" data-chart-hover-guide hidden></line>
+        <circle class="recovery-dot" data-chart-hover-marker r="4.5" hidden></circle>
+      </g>
+      <g data-chart-labels></g>
+      <text class="axis-title" data-axis="x" text-anchor="middle">复通后的时间（天）</text>
+      <text class="axis-title" data-axis="y" text-anchor="middle">预计客流（人次 / 日）</text>
+      <text data-baseline-label text-anchor="end">罢工前 1,000</text>
+      <text data-limit-label text-anchor="end">回流上限 810</text>
+      <rect class="recovery-hit cursor-interaction" data-chart-hit data-chart-hover-overlay="cross-series" aria-hidden="true"></rect>
+    </svg>
+  </figure>
+
+  <div class="recovery-tooltip text-small tabular-nums" role="tooltip" hidden></div>
+  <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-recovery-status></div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('commute-recovery-curves');
+      const svg = root.querySelector('.recovery-chart');
+      const figure = root.querySelector('.recovery-figure');
+      const durationInput = root.querySelector('#recovery-duration');
+      const rateInput = root.querySelector('#recovery-return-rate');
+      const tooltip = root.querySelector('.recovery-tooltip');
+      const hit = root.querySelector('[data-chart-hit]');
+      const path = root.querySelector('[data-recovery-path]');
+      const limitLine = root.querySelector('[data-limit-line]');
+      const limitLabel = root.querySelector('[data-limit-label]');
+      const dots = root.querySelector('[data-day-markers]');
+      const guide = root.querySelector('[data-chart-hover-guide]');
+      const hoverMarker = root.querySelector('[data-chart-hover-marker]');
+      const ns = 'http://www.w3.org/2000/svg';
+      const N = 1000;
+      const acceptance = .10;
+      const sampleTimes = Array.from({ length: 113 }, (_, i) => i / 8);
+      const dayTimes = Array.from({ length: 15 }, (_, i) => i);
+      const fmt = new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 1 });
+      const whole = new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 0 });
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let geometry = null;
+      let visibleState = null;
+      let animation = null;
+      let pinned = false;
+
+      function model(duration, returnRate) {
+        const ceiling = N * Math.pow(1 - acceptance, duration);
+        return {
+          duration, returnRate, ceiling,
+          values: sampleTimes.map(t => ceiling * (1 - Math.pow(1 - returnRate, t))),
+          daily: dayTimes.map(t => ceiling * (1 - Math.pow(1 - returnRate, t)))
+        };
+      }
+
+      function currentModel() {
+        return model(Number(durationInput.value), Number(rateInput.value) / 100);
+      }
+
+      function attrs(element, values) {
+        for (const [key, value] of Object.entries(values)) element.setAttribute(key, String(value));
+        return element;
+      }
+
+      function add(tag, values, parent, content) {
+        const element = document.createElementNS(ns, tag);
+        attrs(element, values);
+        if (content !== undefined) element.textContent = content;
+        parent.appendChild(element);
+        return element;
+      }
+
+      function hideDetail() {
+        tooltip.hidden = true;
+        guide.setAttribute('hidden', '');
+        hoverMarker.setAttribute('hidden', '');
+      }
+
+      function checkLabels() {
+        const texts = Array.from(svg.querySelectorAll('[data-chart-labels] text, .axis-title, [data-baseline-label], [data-limit-label]'));
+        const boxes = texts.map(element => ({ element, box: element.getBoundingClientRect() }));
+        const optional = boxes.find(item => item.element === limitLabel);
+        if (!optional) return;
+        limitLabel.removeAttribute('hidden');
+        for (const item of boxes) {
+          if (item === optional) continue;
+          const a = optional.box;
+          const b = item.box;
+          if (a.width && b.width && a.left < b.right + 4 && a.right + 4 > b.left && a.top < b.bottom + 4 && a.bottom + 4 > b.top) {
+            limitLabel.setAttribute('hidden', '');
+            break;
+          }
+        }
+      }
+
+      function paint(state) {
+        visibleState = state;
+        const { left, right, top, bottom, x, y } = geometry;
+        path.setAttribute('d', state.values.map((value, i) => `${i ? 'L' : 'M'}${x(sampleTimes[i]).toFixed(3)},${y(value).toFixed(3)}`).join(' '));
+        attrs(limitLine, { x1: left, x2: right, y1: y(state.ceiling), y2: y(state.ceiling) });
+        attrs(limitLabel, { x: right - 8, y: y(state.ceiling) - 10 });
+        limitLabel.textContent = `回流上限 ${whole.format(state.ceiling)}`;
+        while (dots.firstChild) dots.removeChild(dots.firstChild);
+        state.daily.forEach((value, i) => add('circle', { cx: x(dayTimes[i]), cy: y(value), r: 2.7, class: 'recovery-dot' }, dots));
+        checkLabels();
+      }
+
+      function redraw() {
+        if (animation !== null) cancelAnimationFrame(animation);
+        animation = null;
+        pinned = false;
+        hideDetail();
+        const measuredWidth = figure.getBoundingClientRect().width || root.getBoundingClientRect().width;
+        if (measuredWidth <= 0) return;
+        const width = Math.round(measuredWidth);
+        const height = width < 400 ? 348 : 370;
+        const left = 72, right = width - 16, top = 16, bottom = height - 64;
+        const state = currentModel();
+        const allY = [0, N, state.ceiling, ...state.values];
+        const minY = Math.min(...allY), maxY = Math.max(...allY);
+        const yTop = maxY + (maxY - minY) * .10;
+        const xMin = Math.min(...sampleTimes), xMax = Math.max(...sampleTimes);
+        const x = t => left + 4 + (t - xMin) / (xMax - xMin) * (right - left - 8);
+        const y = value => bottom - 4 - (value - minY) / (yTop - minY) * (bottom - top - 8);
+        geometry = { width, height, left, right, top, bottom, x, y, xMin, xMax };
+        attrs(svg, { viewBox: `0 0 ${width} ${height}`, height });
+        attrs(root.querySelector('[data-chart-frame]'), { x: left, y: top, width: right - left, height: bottom - top });
+        attrs(root.querySelector('[data-clip-frame]'), { x: left, y: top, width: right - left, height: bottom - top });
+        attrs(hit, { x: left, y: top, width: right - left, height: bottom - top });
+        attrs(root.querySelector('[data-baseline]'), { x1: left, x2: right, y1: y(N), y2: y(N) });
+        attrs(root.querySelector('[data-baseline-label]'), { x: right - 8, y: y(N) - 10 });
+        const grid = root.querySelector('[data-chart-grid]');
+        const labels = root.querySelector('[data-chart-labels]');
+        while (grid.firstChild) grid.removeChild(grid.firstChild);
+        while (labels.firstChild) labels.removeChild(labels.firstChild);
+        const yTicks = width < 400 ? [0, N / 2, N] : [0, N / 4, N / 2, N * 3 / 4, N];
+        for (const value of yTicks) {
+          if (value !== N) add('line', { x1: left, x2: right, y1: y(value), y2: y(value), class: 'recovery-grid' }, grid);
+          add('text', { x: left - 12, y: y(value) + 4, 'text-anchor': 'end' }, labels, whole.format(value));
+        }
+        const xTicks = width < 400 ? [0, 4, 9, 14] : [0, 2, 4, 6, 8, 10, 12, 14];
+        for (const value of xTicks) {
+          add('line', { x1: x(value), x2: x(value), y1: bottom, y2: bottom + 4, class: 'recovery-grid' }, grid);
+          add('text', { x: x(value), y: bottom + 23, 'text-anchor': value === xMin ? 'start' : value === xMax ? 'end' : 'middle' }, labels, String(value));
+        }
+        attrs(root.querySelector('[data-axis="x"]'), { x: (left + right) / 2, y: height - 8 });
+        const midY = (top + bottom) / 2;
+        attrs(root.querySelector('[data-axis="y"]'), { x: 16, y: midY, transform: `rotate(-90 16 ${midY})` });
+        paint(state);
+      }
+
+      function announce() {
+        const state = currentModel();
+        root.querySelector('[data-recovery-status]').textContent = `停运 ${state.duration} 天，每天剩余可回流者的 ${Math.round(state.returnRate * 100)}% 返回。预计 ${fmt.format(N - state.ceiling)} 人继续使用新方案，最终 ${fmt.format(state.ceiling)} 人回到原站。复通第 1 天预计 ${fmt.format(state.daily[1])} 人次，第 7 天 ${fmt.format(state.daily[7])} 人次，第 14 天 ${fmt.format(state.daily[14])} 人次。`;
+      }
+
+      function update() {
+        const next = currentModel();
+        root.querySelector('#recovery-duration-value').textContent = `${next.duration} 天`;
+        root.querySelector('#recovery-rate-value').textContent = `${Math.round(next.returnRate * 100)}%`;
+        durationInput.setAttribute('aria-valuetext', `${next.duration} 天`);
+        rateInput.setAttribute('aria-valuetext', `剩余可回流者的 ${Math.round(next.returnRate * 100)}%`);
+        root.querySelector('[data-adopters]').textContent = whole.format(N - next.ceiling);
+        root.querySelector('[data-ceiling]').textContent = whole.format(next.ceiling);
+        pinned = false;
+        hideDetail();
+        if (animation !== null) cancelAnimationFrame(animation);
+        animation = null;
+        if (!geometry) { redraw(); return; }
+        if (reducedMotion.matches || !visibleState) { paint(next); return; }
+        const previous = visibleState;
+        const started = performance.now();
+        function frame(now) {
+          const phase = Math.min(1, Math.max(0, (now - started) / 180));
+          const mix = 1 - Math.pow(1 - phase, 3);
+          const state = {
+            ...next,
+            ceiling: previous.ceiling + (next.ceiling - previous.ceiling) * mix,
+            values: next.values.map((v, i) => previous.values[i] + (v - previous.values[i]) * mix),
+            daily: next.daily.map((v, i) => previous.daily[i] + (v - previous.daily[i]) * mix)
+          };
+          paint(state);
+          if (phase < 1) animation = requestAnimationFrame(frame);
+          else { animation = null; paint(next); }
+        }
+        animation = requestAnimationFrame(frame);
+      }
+
+      function detailAt(event) {
+        if (!geometry) return;
+        if (animation !== null) { cancelAnimationFrame(animation); animation = null; paint(currentModel()); }
+        const box = svg.getBoundingClientRect();
+        const { left, right, top, bottom, x, y, xMin, xMax } = geometry;
+        const cursor = Math.max(x(xMin), Math.min(x(xMax), event.clientX - box.left));
+        const time = xMin + (cursor - x(xMin)) / (x(xMax) - x(xMin)) * (xMax - xMin);
+        const state = currentModel();
+        const value = state.ceiling * (1 - Math.pow(1 - state.returnRate, time));
+        attrs(guide, { x1: cursor, x2: cursor, y1: top, y2: bottom });
+        guide.removeAttribute('hidden');
+        attrs(hoverMarker, { cx: cursor, cy: y(value) });
+        hoverMarker.removeAttribute('hidden');
+        tooltip.textContent = `连线示意 · 第 ${fmt.format(time)} 天 · 约 ${fmt.format(value)} 人次 / 日`;
+        tooltip.hidden = false;
+        const rootBox = root.getBoundingClientRect();
+        const tooltipBox = tooltip.getBoundingClientRect();
+        const desiredX = box.left - rootBox.left + cursor + 12;
+        const desiredY = box.top - rootBox.top + y(value) - tooltipBox.height - 12;
+        tooltip.style.left = `${Math.max(8, Math.min(rootBox.width - tooltipBox.width - 8, desiredX))}px`;
+        tooltip.style.top = `${Math.max(box.top - rootBox.top + top, desiredY)}px`;
+      }
+
+      durationInput.addEventListener('input', update);
+      rateInput.addEventListener('input', update);
+      durationInput.addEventListener('change', announce);
+      rateInput.addEventListener('change', announce);
+      hit.addEventListener('pointermove', event => { if (!pinned && event.pointerType !== 'touch') detailAt(event); });
+      hit.addEventListener('pointerleave', () => { if (!pinned) hideDetail(); });
+      hit.addEventListener('pointerdown', event => { pinned = true; detailAt(event); });
+      svg.addEventListener('keydown', event => { if (event.key === 'Escape') { pinned = false; hideDetail(); } });
+      const observer = new ResizeObserver(redraw);
+      observer.observe(figure);
+      redraw();
+      update();
+      announce();
+    })();
+  </script>
+</section>

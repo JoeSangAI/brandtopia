@@ -1,0 +1,308 @@
+{
+  "schema": "brandtopia.archived-calculations.v1",
+  "archived_on": "2026-11-22",
+  "status": "synthetic_calculation_verified",
+  "empirical_validation": false,
+  "scope": "Recalculation of explicit historical toy formulas; no human data, no new paper replication, no recovered random history.",
+  "three_person": {
+    "record": "CHAT-01",
+    "sequential_outcomes": {
+      "110_then_B_C": "100",
+      "101_then_B_C": "111",
+      "110_then_C_B": "111"
+    },
+    "random_order_theoretical_probabilities": {
+      "100": 0.5,
+      "111": 0.5
+    },
+    "fixed_threshold_sequence": [
+      "100",
+      "110",
+      "101",
+      "110",
+      "101",
+      "110"
+    ],
+    "experience_sequence": [
+      "100",
+      "110",
+      "101",
+      "110",
+      "111",
+      "111"
+    ]
+  },
+  "attendance": {
+    "record": "CHAT-03",
+    "n": 10,
+    "marginal_attendance_probability": 0.9,
+    "expected_count_both": 9,
+    "independent_p_all_absent": 1e-10,
+    "shared_p_all_absent": 0.1,
+    "independent_count_probabilities": [
+      1e-10,
+      9e-09,
+      3.645e-07,
+      8.748e-06,
+      0.000137781,
+      0.0014880348,
+      0.011160261,
+      0.057395628,
+      0.1937102445,
+      0.387420489,
+      0.3486784401
+    ],
+    "shared_count_probabilities": [
+      0.1,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.9
+    ]
+  },
+  "route_recovery": {
+    "record": "CHAT-04",
+    "n": 1000,
+    "daily_alternative_commitment": 0.1,
+    "outage_days": 2,
+    "daily_return_fraction": 0.5,
+    "limit": 810.0,
+    "expected_counts_t0_to_t14": [
+      0.0,
+      405.0,
+      607.5,
+      708.75,
+      759.375,
+      784.6875,
+      797.34375,
+      803.671875,
+      806.8359375,
+      808.41796875,
+      809.208984375,
+      809.6044921875,
+      809.80224609375,
+      809.901123046875,
+      809.950561523438
+    ]
+  },
+  "price": {
+    "record": "CHAT-06",
+    "buy_counts": {
+      "A": {
+        "80": 4,
+        "100": 0
+      },
+      "B": {
+        "80": 4,
+        "100": 4
+      }
+    },
+    "stable_choice_assumptions_required": true
+  },
+  "ad_discount": {
+    "record": "CHAT-07",
+    "ad_budget": 40,
+    "discount_budget": 40,
+    "orders_both": 4,
+    "ad_contribution": 120,
+    "discount_contribution": 120,
+    "metric": "Contribution after product cost and specified intervention only; not net profit."
+  },
+  "old_retention_audit": {
+    "record": "CHAT-08",
+    "illustrative_total_t0_to_t5": [
+      4.0,
+      3.4,
+      2.98,
+      2.686,
+      2.4802,
+      2.33614
+    ],
+    "formula": "2 + 2 * 0.7**t",
+    "limit": 2,
+    "warning": "Explanation of old illustrative output, not a repaired or validated ad-versus-promotion engine."
+  },
+  "stage_learning": {
+    "record": "CHAT-09",
+    "per_exposure_progress": 0.22,
+    "unfamiliar_two_stage_probability_n0_to_n20": [
+      0.0,
+      0.0,
+      0.0484,
+      0.123904,
+      0.21224368,
+      0.3041169472,
+      0.39369338272,
+      0.477536926367,
+      0.553834551085,
+      0.621848433691,
+      0.681530615678,
+      0.7332551734,
+      0.777634843926,
+      0.815397909028,
+      0.847307699039,
+      0.874111922648,
+      0.896512595235,
+      0.915149954828,
+      0.930595666591,
+      0.943352007364,
+      0.953854727935
+    ],
+    "familiar_initial_level": 0.45,
+    "familiar_retrieval_probability_n0_to_n20": [
+      0.45,
+      0.6975,
+      0.833625,
+      0.90849375,
+      0.9496715625,
+      0.972319359375,
+      0.984775647656,
+      0.991626606211,
+      0.995394633416,
+      0.997467048379,
+      0.998606876608,
+      0.999233782135,
+      0.999578580174,
+      0.999768219096,
+      0.999872520503,
+      0.999929886276,
+      0.999961437452,
+      0.999978790599,
+      0.999988334829,
+      0.999993584156,
+      0.999996471286
+    ]
+  },
+  "belief_update": {
+    "record": "CHAT-12",
+    "prior_changed": 0.01,
+    "bad_rate_stable": 0.1,
+    "bad_rate_changed": 0.6,
+    "posterior_rows": [
+      {
+        "consecutive_bad": 0,
+        "p_changed": 0.01,
+        "p_next_bad": 0.105
+      },
+      {
+        "consecutive_bad": 1,
+        "p_changed": 0.057142857143,
+        "p_next_bad": 0.128571428571
+      },
+      {
+        "consecutive_bad": 2,
+        "p_changed": 0.266666666667,
+        "p_next_bad": 0.233333333333
+      },
+      {
+        "consecutive_bad": 3,
+        "p_changed": 0.685714285714,
+        "p_next_bad": 0.442857142857
+      },
+      {
+        "consecutive_bad": 4,
+        "p_changed": 0.929032258065,
+        "p_next_bad": 0.564516129032
+      },
+      {
+        "consecutive_bad": 5,
+        "p_changed": 0.987428571429,
+        "p_next_bad": 0.593714285714
+      },
+      {
+        "consecutive_bad": 6,
+        "p_changed": 0.997882579403,
+        "p_next_bad": 0.598941289702
+      }
+    ],
+    "after_three_bad_cautious_stops_at_risk_gt_0_25": true,
+    "after_three_bad_tolerant_stops_at_risk_gt_0_50": false,
+    "sequence_sensitive_change_point_model": false
+  },
+  "task_choice": {
+    "record": "CHAT-17",
+    "brand_a": [
+      9,
+      5
+    ],
+    "brand_b": [
+      6,
+      8
+    ],
+    "rows": [
+      {
+        "task_weight": 0.8,
+        "score_a": 8.2,
+        "score_b": 6.4,
+        "p_a": 0.8581489351,
+        "p_b": 0.1418510649
+      },
+      {
+        "task_weight": 0.7,
+        "score_a": 7.8,
+        "score_b": 6.6,
+        "p_a": 0.768524783499,
+        "p_b": 0.231475216501
+      },
+      {
+        "task_weight": 0.2,
+        "score_a": 5.8,
+        "score_b": 7.6,
+        "p_a": 0.1418510649,
+        "p_b": 0.8581489351
+      }
+    ],
+    "denominator": "Choice occasions conditional on buying one of A and B."
+  },
+  "human_sample_planning": {
+    "record": "CHAT-20",
+    "data_collected": false,
+    "alpha_two_sided": 0.05,
+    "power": 0.8,
+    "method": "Equal independent groups; normal approximation; no continuity correction.",
+    "plans": [
+      {
+        "p0": 0.2,
+        "p1": 0.4,
+        "effect_pp": 20.0,
+        "n_per_group_unrounded": 81.224240695455,
+        "n_per_group": 82,
+        "total_n": 164
+      },
+      {
+        "p0": 0.2,
+        "p1": 0.35,
+        "effect_pp": 15.0,
+        "n_per_group_unrounded": 137.914753135555,
+        "n_per_group": 138,
+        "total_n": 276
+      },
+      {
+        "p0": 0.2,
+        "p1": 0.3,
+        "effect_pp": 10.0,
+        "n_per_group_unrounded": 293.151285506487,
+        "n_per_group": 294,
+        "total_n": 588
+      },
+      {
+        "p0": 0.2,
+        "p1": 0.25,
+        "effect_pp": 5.0,
+        "n_per_group_unrounded": 1093.739045766165,
+        "n_per_group": 1094,
+        "total_n": 2188
+      }
+    ],
+    "mde_pp_at_total_n": {
+      "200": 17.859646743961,
+      "240": 16.175308253743
+    }
+  }
+}

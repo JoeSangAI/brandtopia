@@ -1,0 +1,232 @@
+<div id="experience-and-intervention" lang="zh-CN">
+  <style>
+    #experience-and-intervention { color: var(--foreground); display: grid; gap: 18px; }
+    #experience-and-intervention .history-heading { padding-right: 96px; }
+    #experience-and-intervention .history-heading h3 { margin: 0 0 6px; }
+    #experience-and-intervention .history-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    #experience-and-intervention .history-model { display: grid; gap: 12px; min-width: 0; }
+    #experience-and-intervention .history-model-title { font-weight: 500; }
+    #experience-and-intervention .history-people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
+    #experience-and-intervention .history-person { display: grid; justify-items: center; align-content: start; gap: 7px; min-width: 0; text-align: center; }
+    #experience-and-intervention .history-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--muted); color: var(--foreground); font-weight: 500; }
+    #experience-and-intervention .history-person[data-active="true"] .history-mark { background: color-mix(in srgb, var(--viz-series-1) 26%, transparent); }
+    #experience-and-intervention .history-detail { min-height: 44px; overflow-wrap: anywhere; }
+    #experience-and-intervention .history-records { display: grid; gap: 8px; }
+  </style>
+
+  <div class="history-heading">
+    <h3>一次干预，两种后续</h3>
+    <div class="text-small text-muted">同步决定 · 允许退出 · 只在第 1 轮强制乙参加</div>
+  </div>
+
+  <div class="history-row">
+    <span class="tabular-nums" data-round-label>第 0 轮</span>
+    <span class="text-small" data-phase>起点：只有甲参加</span>
+  </div>
+
+  <div class="viz-grid">
+    <section class="history-model" data-model="fixed" aria-label="门槛始终固定的对照版本">
+      <div class="history-row">
+        <span class="history-model-title">门槛固定</span>
+        <span class="tabular-nums" data-total>1 / 3 人</span>
+      </div>
+      <div class="history-people">
+        <div class="history-person" data-person="0" data-active="true">
+          <div class="history-mark">甲</div>
+          <span data-state>参加</span>
+          <span class="text-small text-muted">始终参加</span>
+        </div>
+        <div class="history-person" data-person="1" data-active="false">
+          <div class="history-mark">乙</div>
+          <span data-state>未参加</span>
+          <span class="text-small tabular-nums" data-threshold>下轮门槛：2</span>
+          <span class="text-small text-muted tabular-nums" data-count>累计参与：0轮</span>
+        </div>
+        <div class="history-person" data-person="2" data-active="false">
+          <div class="history-mark">丙</div>
+          <span data-state>未参加</span>
+          <span class="text-small tabular-nums" data-threshold>下轮门槛：2</span>
+          <span class="text-small text-muted tabular-nums" data-count>累计参与：0轮</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="history-model" data-model="experience" aria-label="累计参与两轮后门槛降低的实验版本">
+      <div class="history-row">
+        <span class="history-model-title">经历改变门槛</span>
+        <span class="tabular-nums" data-total>1 / 3 人</span>
+      </div>
+      <div class="history-people">
+        <div class="history-person" data-person="0" data-active="true">
+          <div class="history-mark">甲</div>
+          <span data-state>参加</span>
+          <span class="text-small text-muted">始终参加</span>
+        </div>
+        <div class="history-person" data-person="1" data-active="false">
+          <div class="history-mark">乙</div>
+          <span data-state>未参加</span>
+          <span class="text-small tabular-nums" data-threshold>下轮门槛：2</span>
+          <span class="text-small text-muted tabular-nums" data-count>累计参与：0轮</span>
+        </div>
+        <div class="history-person" data-person="2" data-active="false">
+          <div class="history-mark">丙</div>
+          <span data-state>未参加</span>
+          <span class="text-small tabular-nums" data-threshold>下轮门槛：2</span>
+          <span class="text-small text-muted tabular-nums" data-count>累计参与：0轮</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="viz-controls" role="group" aria-label="推进或重新开始两种版本的对照实验">
+    <button type="button" class="btn btn-primary" data-action="next">推进一轮</button>
+    <button type="button" class="btn" data-action="restart">回到起点</button>
+  </div>
+
+  <div class="history-detail text-small" role="status" aria-live="polite" aria-atomic="true" data-detail>起点相同：乙、丙的门槛都是2，累计参与轮数都是0。</div>
+
+  <div class="history-records">
+    <span class="text-small text-muted">最近8轮的参与者记录</span>
+    <table class="table table-sm" aria-label="两个版本逐轮演化的参与者记录">
+      <thead><tr><th scope="col">轮次</th><th scope="col">门槛固定</th><th scope="col">经历改变门槛</th></tr></thead>
+      <tbody>
+        <tr data-record="0"><th scope="row" class="tabular-nums" data-record-round>0</th><td data-record-fixed>甲</td><td data-record-experience>甲</td></tr>
+        <tr data-record="1" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+        <tr data-record="2" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+        <tr data-record="3" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+        <tr data-record="4" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+        <tr data-record="5" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+        <tr data-record="6" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+        <tr data-record="7" hidden><th scope="row" class="tabular-nums" data-record-round></th><td data-record-fixed></td><td data-record-experience></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('experience-and-intervention');
+      const names = ['甲', '乙', '丙'];
+      const roundLabel = root.querySelector('[data-round-label]');
+      const phaseLabel = root.querySelector('[data-phase]');
+      const detail = root.querySelector('[data-detail]');
+      const recordRows = Array.from(root.querySelectorAll('[data-record]'));
+      const panels = ['fixed', 'experience'].map(key => {
+        const element = root.querySelector('[data-model="' + key + '"]');
+        return {
+          key,
+          element,
+          total: element.querySelector('[data-total]'),
+          people: Array.from(element.querySelectorAll('[data-person]'))
+        };
+      });
+
+      function initialWorld() {
+        return { state: [true, false, false], thresholds: [0, 2, 2], counts: [0, 0, 0], reasons: ['', '', ''], changes: [] };
+      }
+
+      let round = 0;
+      let records = [{ round: 0, fixed: initialWorld(), experience: initialWorld() }];
+
+      function advance(previous, learns, nextRound) {
+        const reasons = [];
+        const state = previous.state.map((wasActive, index) => {
+          if (index === 0) {
+            reasons[index] = '甲始终参加。';
+            return true;
+          }
+          const visible = previous.state.reduce((sum, active, other) => sum + Number(active && other !== index), 0);
+          if (nextRound === 1 && index === 1) {
+            reasons[index] = '乙在第1轮被强制参加，这轮计入累计参与。';
+            return true;
+          }
+          const joins = visible >= previous.thresholds[index];
+          const action = joins ? (wasActive ? '留下' : '加入') : (wasActive ? '退出' : '等待');
+          reasons[index] = names[index] + '看到上一轮有' + visible + '位其他人参加，按门槛' + previous.thresholds[index] + '决定' + action + '。';
+          return joins;
+        });
+        const counts = previous.counts.map((count, index) => count + Number(state[index]));
+        const thresholds = previous.thresholds.slice();
+        const changes = [];
+        if (learns) {
+          [1, 2].forEach(index => {
+            if (counts[index] >= 2 && thresholds[index] === 2) {
+              thresholds[index] = 1;
+              changes.push(names[index] + '累计参与2轮，下轮门槛降为1');
+            }
+          });
+        }
+        return { state, thresholds, counts, reasons, changes };
+      }
+
+      function participants(world) {
+        return names.filter((_, index) => world.state[index]).join('、');
+      }
+
+      function render() {
+        const frame = records[records.length - 1];
+        roundLabel.textContent = '第 ' + round + ' 轮';
+        phaseLabel.textContent = round === 0 ? '起点：只有甲参加' : round === 1 ? '本轮强制乙参加' : '干预已撤去';
+
+        panels.forEach(panel => {
+          const world = frame[panel.key];
+          panel.total.textContent = world.state.filter(Boolean).length + ' / 3 人';
+          panel.people.forEach((person, index) => {
+            person.dataset.active = String(world.state[index]);
+            person.querySelector('[data-state]').textContent = world.state[index] ? '参加' : '未参加';
+            const reason = round ? ' ' + world.reasons[index] : '';
+            person.setAttribute('aria-label', names[index] + '：' + (world.state[index] ? '参加' : '未参加') + reason);
+            if (index > 0) {
+              person.querySelector('[data-threshold]').textContent = '下轮门槛：' + world.thresholds[index];
+              person.querySelector('[data-count]').textContent = '累计参与：' + world.counts[index] + '轮';
+              person.setAttribute('data-tooltip', round ? world.reasons[index] : '只数其他参与者，初始门槛为2。');
+            }
+          });
+          panel.element.dataset.state = world.state.map(Number).join('');
+          panel.element.dataset.thresholds = world.thresholds.join(',');
+          panel.element.dataset.counts = world.counts.join(',');
+        });
+
+        if (round === 0) {
+          detail.textContent = '起点相同：乙、丙的门槛都是2，累计参与轮数都是0。';
+        } else if (round === 1) {
+          detail.textContent = '两版都只在本轮强制乙参加；丙读取上一轮状态，继续等待。';
+        } else if (frame.experience.changes.length) {
+          const difference = frame.fixed.state.join('') !== frame.experience.state.join('');
+          detail.textContent = (difference ? '经历版：乙按门槛1留下，丙加入。' : '经历版：') + frame.experience.changes.join('；') + '。';
+        } else {
+          detail.textContent = '门槛固定：' + participants(frame.fixed) + '参加；经历改变门槛：' + participants(frame.experience) + '参加。';
+        }
+
+        const visible = records.slice(-8);
+        recordRows.forEach((row, index) => {
+          const record = visible[index];
+          row.hidden = !record;
+          row.querySelector('[data-record-round]').textContent = record ? String(record.round) : '';
+          row.querySelector('[data-record-fixed]').textContent = record ? participants(record.fixed) : '';
+          row.querySelector('[data-record-experience]').textContent = record ? participants(record.experience) : '';
+        });
+        root.dataset.round = String(round);
+      }
+
+      root.querySelector('[data-action="next"]').addEventListener('click', () => {
+        const previous = records[records.length - 1];
+        const nextRound = round + 1;
+        records.push({
+          round: nextRound,
+          fixed: advance(previous.fixed, false, nextRound),
+          experience: advance(previous.experience, true, nextRound)
+        });
+        round = nextRound;
+        render();
+      });
+
+      root.querySelector('[data-action="restart"]').addEventListener('click', () => {
+        round = 0;
+        records = [{ round: 0, fixed: initialWorld(), experience: initialWorld() }];
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</div>

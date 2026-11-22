@@ -1,0 +1,118 @@
+<div id="ten-person-invitation" lang="zh-CN">
+  <style>
+    #ten-person-invitation { color: var(--foreground); display: grid; gap: 18px; }
+    #ten-person-invitation .invite-heading { padding-right: 96px; }
+    #ten-person-invitation .invite-heading h3 { margin: 0 0 6px; }
+    #ten-person-invitation .invite-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    #ten-person-invitation .invite-world { display: grid; gap: 18px; padding: 8px 0; }
+    #ten-person-invitation .invite-people { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 14px 8px; }
+    #ten-person-invitation .invite-person { display: grid; justify-items: center; align-content: start; gap: 8px; min-width: 0; text-align: center; }
+    #ten-person-invitation .invite-mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--muted); color: var(--foreground); }
+    #ten-person-invitation .invite-person[data-status="attend"] .invite-mark { background: color-mix(in srgb, var(--viz-series-1) 28%, transparent); }
+    #ten-person-invitation .invite-detail { min-height: 36px; overflow-wrap: anywhere; }
+    #ten-person-invitation .invite-summary { display: grid; gap: 8px; }
+    @media (max-width: 519px) {
+      #ten-person-invitation .invite-people { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+  </style>
+
+  <div class="invite-heading">
+    <h3>十个人会来几个</h3>
+    <div class="text-small text-muted">甲已报名 · 十人门槛均为 1 · 甲不计入人数</div>
+  </div>
+
+  <div class="text-small">每人参加概率 90% · 各人、各次相互独立</div>
+
+  <div class="invite-world" role="group" aria-label="最近一次邀约中十个人的参加状态">
+    <div class="invite-row tabular-nums">
+      <span data-trial>尚未模拟</span>
+      <span data-current>本次 — / 10 人参加</span>
+    </div>
+    <div class="invite-people">
+      <div class="invite-person" data-person="0" data-status="pending" aria-label="01号：待定"><div class="invite-mark tabular-nums">01</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="1" data-status="pending" aria-label="02号：待定"><div class="invite-mark tabular-nums">02</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="2" data-status="pending" aria-label="03号：待定"><div class="invite-mark tabular-nums">03</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="3" data-status="pending" aria-label="04号：待定"><div class="invite-mark tabular-nums">04</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="4" data-status="pending" aria-label="05号：待定"><div class="invite-mark tabular-nums">05</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="5" data-status="pending" aria-label="06号：待定"><div class="invite-mark tabular-nums">06</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="6" data-status="pending" aria-label="07号：待定"><div class="invite-mark tabular-nums">07</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="7" data-status="pending" aria-label="08号：待定"><div class="invite-mark tabular-nums">08</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="8" data-status="pending" aria-label="09号：待定"><div class="invite-mark tabular-nums">09</div><span class="text-small" data-state>待定</span></div>
+      <div class="invite-person" data-person="9" data-status="pending" aria-label="10号：待定"><div class="invite-mark tabular-nums">10</div><span class="text-small" data-state>待定</span></div>
+    </div>
+  </div>
+
+  <div class="viz-controls" role="group" aria-label="模拟独立的约饭机会">
+    <button type="button" class="btn btn-primary" data-run="1">模拟一次邀约</button>
+    <button type="button" class="btn" data-run="20">独立模拟 20 次</button>
+  </div>
+
+  <div class="invite-detail text-small" role="status" aria-live="polite" aria-atomic="true" data-detail>尚无观察记录</div>
+
+  <div class="invite-summary" role="group" aria-label="多次邀约的平均参加人数">
+    <div class="invite-row tabular-nums">
+      <span data-trials>累计 0 次邀约</span>
+      <span class="text-small text-muted">理论平均：9 人</span>
+    </div>
+    <div class="tabular-nums" data-average>实际平均：— 人</div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('ten-person-invitation');
+      const people = Array.from(root.querySelectorAll('[data-person]'));
+      const buttons = Array.from(root.querySelectorAll('[data-run]'));
+      const trialLabel = root.querySelector('[data-trial]');
+      const currentLabel = root.querySelector('[data-current]');
+      const detail = root.querySelector('[data-detail]');
+      const trialsLabel = root.querySelector('[data-trials]');
+      const averageLabel = root.querySelector('[data-average]');
+      let trials = 0;
+      let totalAttendances = 0;
+
+      function runOnce() {
+        const attendance = Array.from({ length: 10 }, () => {
+          const busy = Math.random() < 0.1;
+          return !busy;
+        });
+        const count = attendance.filter(Boolean).length;
+        trials += 1;
+        totalAttendances += count;
+        return { attendance, count };
+      }
+
+      function render(result) {
+        const absent = [];
+        people.forEach((person, index) => {
+          const attended = result.attendance[index];
+          const number = String(index + 1).padStart(2, '0');
+          person.dataset.status = attended ? 'attend' : 'absent';
+          person.querySelector('[data-state]').textContent = attended ? '参加' : '缺席';
+          person.setAttribute('aria-label', number + '号：' + (attended ? '参加' : '临时有事，缺席'));
+          if (!attended) absent.push(number);
+        });
+        trialLabel.textContent = '第 ' + trials + ' 次邀约';
+        currentLabel.textContent = '本次 ' + result.count + ' / 10 人参加';
+        detail.textContent = '第 ' + trials + ' 次：' + result.count + ' 人参加；' + (absent.length ? '缺席者 ' + absent.join('、') + '。' : '无人缺席。');
+        trialsLabel.textContent = '累计 ' + trials + ' 次邀约';
+        averageLabel.textContent = '实际平均：' + (totalAttendances / trials).toFixed(2) + ' 人';
+        root.dataset.trials = String(trials);
+        root.dataset.totalAttendances = String(totalAttendances);
+        root.dataset.lastCount = String(result.count);
+        root.dataset.attendance = result.attendance.map(Number).join('');
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const count = Number(button.dataset.run);
+          let result;
+          for (let index = 0; index < count; index += 1) result = runOnce();
+          render(result);
+        });
+      });
+
+      root.dataset.trials = '0';
+      root.dataset.totalAttendances = '0';
+    })();
+  </script>
+</div>

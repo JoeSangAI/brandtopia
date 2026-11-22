@@ -1,0 +1,72 @@
+{
+  "schema": "brandtopia.chat-demo-archive.v1",
+  "archived_on": "2026-11-22",
+  "original_conversation_dates": "not fully recoverable",
+  "source_scope": "Surviving conversation fragments; not a full transcript or old random-draw history.",
+  "exports": "Standalone HTML generated from unchanged fragments with the Visualize export utility.",
+  "files": [
+    {
+      "id": "three-person-lab",
+      "title": "三人参与：初始状态与更新顺序",
+      "fragment": "artifacts/chat-demos/fragments/three-person-lab.html",
+      "fragment_sha256": "cbe0c9490d62f330fcab98868782caf51268df769059c05b2af6a07a7eb79f2a",
+      "export": "artifacts/chat-demos/three-person-lab.html",
+      "export_sha256": "c43cdb165567ab0eac93206d08e2b844598c72f60eaaae55945f34626dba8f37",
+      "original_fragment_preserved": true
+    },
+    {
+      "id": "three-person-random-order",
+      "title": "三人参与：随机更新顺序",
+      "fragment": "artifacts/chat-demos/fragments/three-person-random-order.html",
+      "fragment_sha256": "6aab05ba9ee368bfc6406aa5d8b4d66f3fbd7f57e2c76c95d933f2222131d4f6",
+      "export": "artifacts/chat-demos/three-person-random-order.html",
+      "export_sha256": "ddf498b9dddbc98472d47ce52e9f740de4eb3ededaca8e6505a89995bc904e47",
+      "original_fragment_preserved": true
+    },
+    {
+      "id": "ten-person-invitation",
+      "title": "十人邀约：独立缺席",
+      "fragment": "artifacts/chat-demos/fragments/ten-person-invitation.html",
+      "fragment_sha256": "92640d43ddbbde4ec08efb7401dda0aac49c931c4b6d178b897db4049a08275b",
+      "export": "artifacts/chat-demos/ten-person-invitation.html",
+      "export_sha256": "c8b5ee9bb0a5b54c6919cbbc6240808b1524f862d784bb122d94c8e32179ce75",
+      "original_fragment_preserved": true
+    },
+    {
+      "id": "shared-event-invitation",
+      "title": "十人邀约：独立事件与共同冲击",
+      "fragment": "artifacts/chat-demos/fragments/shared-event-invitation.html",
+      "fragment_sha256": "e0f1e735b81ce0bd86f10543daceaec04d0e9cc4546a7f0b16adad3cf4f2dae5",
+      "export": "artifacts/chat-demos/shared-event-invitation.html",
+      "export_sha256": "8c0945cd9bcf541171a78ada18cb1d54a83b538b1dfcdb32e9b47110c02e282b",
+      "original_fragment_preserved": true
+    },
+    {
+      "id": "experience-and-intervention",
+      "title": "一次干预与经历改变门槛",
+      "fragment": "artifacts/chat-demos/fragments/experience-and-intervention.html",
+      "fragment_sha256": "facddf2e7625abf9f9b86eab3eab3b3c214e925d145a3028ccbd039cebcfdd0d",
+      "export": "artifacts/chat-demos/experience-and-intervention.html",
+      "export_sha256": "833dccf27d49ef3ab9bd14c9c8e428e747dd0864726da777d24e0cc097d6ad91",
+      "original_fragment_preserved": true
+    },
+    {
+      "id": "commute-recovery-curves",
+      "title": "停运长度与路线恢复",
+      "fragment": "artifacts/chat-demos/fragments/commute-recovery-curves.html",
+      "fragment_sha256": "6e8dbd3e5f27a32e277acc117ef563d255b6f880b1c3aa1109043e90714dcc26",
+      "export": "artifacts/chat-demos/commute-recovery-curves.html",
+      "export_sha256": "d666f51aabfa5c4addfa96533ea3f3799ace805b701234c025823909bded694d",
+      "original_fragment_preserved": true
+    },
+    {
+      "id": "task-conditioned-choice",
+      "title": "只改变任务的品牌选择",
+      "fragment": "artifacts/chat-demos/fragments/task-conditioned-choice.html",
+      "fragment_sha256": "3d8d2ffa784b67f97250269267a0a2205f7d4a60fe996dd50a338bea9c289700",
+      "export": "artifacts/chat-demos/task-conditioned-choice.html",
+      "export_sha256": "3429432080535beba07615f8f8c87f7395ea8e7ac770f3fd6c748938c66c1a9c",
+      "original_fragment_preserved": true
+    }
+  ]
+}

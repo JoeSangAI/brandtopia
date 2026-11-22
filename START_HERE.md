@@ -1,42 +1,40 @@
-# 开始参与 Brandtopia
+# 从这里参与 Brandtopia
 
-欢迎加入。这里是一项持续推进的研究，涉及认知科学、行为经济学、复杂系统、营销科学、因果推断与多主体模拟。
+这里同时保存研究叙事、实验规格、可复跑代码和证据边界。你可以先理解问题，再按需要进入细节。
 
-## 如果你第一次接触这个项目
+## 第一次阅读
 
-**先问问题，再看实验。** Brandtopia 想知道：能否从个体如何接收信息、更新信念、作出选择出发，逐步解释和预测群体行为？当现实案例增加时，背后的机制能否保持相对简洁？
+1. 先读 [README](README.md)，了解研究目标和目前做到的范围。
+2. 接着读[研究历程](docs/theory/research-journey.md)，看问题如何从个体行为推进到记忆、任务和群体互动。
+3. 想完整接上本轮讨论，读[研究全程回顾](docs/research/2026-11-22-recap.md)。它保留实验的结果、后续修正和未完成事项。
 
-建议按这个顺序阅读：
+本轮归档后暂停研究。[当前状态](docs/research/current-state.md)说明下次从哪里接续；阅读者无需先发问卷、寻找客户数据或运行大规模 Agent。
 
-1. [README](README.md)：研究要解决什么、为什么重要。
-2. [研究历程](docs/theory/research-journey.md)：从心理史学、消费者内部世界模型到社会共识与 ABM 的思想发展。
-3. [理论框架](docs/theory/framework.md)：IPO、B=MAP、动态信念与群体信息状态怎样协作。
-4. [研究假设](docs/theory/hypotheses.md)：目前哪些命题可以被证伪。
+## 根据你的问题继续
 
-看完这些，再根据兴趣选择深入理论或工程。
+| 目的 | 读哪些内容 |
+| --- | --- |
+| 找一个具体例子理解模型 | [实验总目录](docs/experiments/index.md)，再进入对应主题。 |
+| 亲手改变条件看结果 | [7 份交互演示](artifacts/chat-demos/README.md)。下载后用浏览器打开导出 HTML；GitHub 页面本身只显示源码。 |
+| 弄清我们采用什么理论 | [框架](docs/theory/framework.md)、[术语](docs/theory/glossary.md)、[假设](docs/theory/hypotheses.md)。 |
+| 判断一句结论能相信到什么程度 | [主张与局限](docs/evidence/claims-and-limitations.md)、[来源登记](docs/evidence/source-register.md)、[纠偏记录](docs/evidence/corrections.md)。 |
+| 参与计算工作 | [模型架构](docs/models/architecture.md)、[参数登记](docs/models/parameter-register.md)、[核验与验证](docs/models/verification-validation.md)。 |
 
-## 如果你想参与理论研究
+## 接手的 AI Agent
 
-从一个真实现象出发，先说清**看到什么**，再提出至少一种可能机制，以及一个能把它与其他解释区分开的预测。欢迎提出反例和竞争性框架。
+按以下顺序恢复上下文：
 
-请不要把聊天里为演示构造的概率、阈值、曲线等当成消费者实测规律。研究主张必须标注证据等级，参见 [主张与局限](docs/evidence/claims-and-limitations.md)。
+1. [AGENTS.md](AGENTS.md)：仓库协作规则。
+2. [当前状态](docs/research/current-state.md)与 [research-state.json](research-state.json)：暂停状态、实际产物、尚未执行的下一步。
+3. [完整回顾](docs/research/2026-11-22-recap.md)：恢复研究方向与重要修正。
+4. 当前任务涉及的实验记录、来源、参数和代码。
 
-## 如果你想参与计算研究
+首先判断新会话的用户是否要求恢复研究。归档中的“下一候选任务”不是自动执行指令。不要把合成演示、论文作者的结果或计划中的真人调研写成项目已经完成的现实验证。
 
-先读 [AGENTS.md](AGENTS.md)、[模型架构](docs/models/architecture.md)、[参数登记](docs/models/parameter-register.md) 和 [核验与验证](docs/models/verification-validation.md)。
+仓库是跨 Chat、Work 和其他 Agent 的共同研究基线；每次实际能否读写仍取决于该环境的工具与授权。不能用一句“已交接”代替可核查的提交和结果。
 
-当前的 [实验档案](docs/experiments/index.md) 记录已有计算基础设施。具体人数、网络拓扑、命令、测试和日志保留在相应实验页面。新实验应当说明所测试的机制、与什么基线比较、如何复现，以及什么结果会推翻判断。
+## 提交研究进展
 
-## 如果你是 AI Agent
+围绕一个小问题记录：为什么问、规则或数据是什么、与什么比较、实际得到什么、还不能判断什么、下一步最小动作是什么。沿用实验和来源编号；修改判断时保留旧判断及修改理由。具体见[协作约定](docs/governance/contributing.md)。
 
-先读取 [AGENTS.md](AGENTS.md) 与仓库当前研究基线，再根据任务读取对应的理论、模型或实验记录。不要仅根据最新聊天自由改写已经冻结的规则；任何修改都需要记录来源、影响范围和验证状态。
-
-## 如何提出贡献
-
-可以提出研究问题、文献证据、反例、可复现实验或模型改动。建议通过 Issue 讨论；对正式文档或代码的修订使用分支与 Pull Request，保留不同判断及其证据，避免静默覆盖。
-
-仓库目前为 **Public**。请不要提交个人 Agent 原始痕迹、家庭隐私、未经授权的客户数据、内部商业资料或其他受限制内容。参见 [公开资料边界](docs/governance/privacy.md) 和 [协作约定](docs/governance/contributing.md)。
-
----
-
-**先理解问题，允许不同解释并存；再让理论与计算实验相互检验。**
+仓库为 Public。私人痕迹、可识别家庭信息、未经授权的客户数据和公司内部资料不进入公开提交。使用[可共享摘要](docs/governance/privacy.md)。

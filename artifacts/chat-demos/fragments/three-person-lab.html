@@ -1,0 +1,119 @@
+<div id="three-person-lab" lang="zh-CN">
+  <style>
+    #three-person-lab { color: var(--foreground); display: grid; gap: 20px; }
+    #three-person-lab .lab-heading { padding-right: 96px; }
+    #three-person-lab .lab-heading h3 { margin: 0 0 6px; }
+    #three-person-lab .lab-starts { display: grid; gap: 8px; }
+    #three-person-lab .lab-world { display: grid; gap: 18px; padding: 12px 0; }
+    #three-person-lab .lab-status { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    #three-person-lab .lab-agents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    #three-person-lab .lab-agent { display: grid; justify-items: center; align-content: start; gap: 8px; min-width: 0; text-align: center; }
+    #three-person-lab .lab-mark { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--muted); color: var(--foreground); }
+    #three-person-lab .lab-agent[data-active="true"] .lab-mark { background: color-mix(in srgb, var(--viz-series-1) 22%, transparent); }
+    #three-person-lab .lab-name { font-weight: 500; }
+    #three-person-lab .lab-state { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    #three-person-lab .lab-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted-foreground); }
+    #three-person-lab .lab-agent[data-active="true"] .lab-dot { background: var(--viz-series-1); }
+    #three-person-lab .lab-details { min-height: 40px; overflow-wrap: anywhere; }
+    #three-person-lab .lab-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  </style>
+
+  <div class="lab-heading">
+    <h3>三人实验</h3>
+    <div class="text-small text-muted">乙先决定 → 丙看最新状态决定</div>
+  </div>
+
+  <div class="lab-starts">
+    <span class="text-small text-muted" id="lab-start-label">初始参与者</span>
+    <div class="viz-controls" role="group" aria-labelledby="lab-start-label">
+      <button type="button" class="btn" data-start="110" aria-pressed="true">从甲乙开始</button>
+      <button type="button" class="btn" data-start="101" aria-pressed="false">从甲丙开始</button>
+    </div>
+  </div>
+
+  <div class="lab-world" role="group" aria-label="当前三个人的状态">
+    <div class="lab-status tabular-nums">
+      <span data-round>第 0 轮</span>
+      <span data-total>2 / 3 人参加</span>
+    </div>
+    <div class="lab-agents">
+      <div class="lab-agent" data-agent="0" data-active="true">
+        <div class="lab-mark"><span class="lab-name">甲</span></div>
+        <div class="lab-state"><span class="lab-dot" aria-hidden="true"></span><span data-state>参加</span></div>
+        <span class="text-small text-muted">始终参加</span>
+      </div>
+      <div class="lab-agent" data-agent="1" data-active="true">
+        <div class="lab-mark"><span class="lab-name">乙</span></div>
+        <div class="lab-state"><span class="lab-dot" aria-hidden="true"></span><span data-state>参加</span></div>
+        <span class="text-small text-muted">需另 2 人</span>
+      </div>
+      <div class="lab-agent" data-agent="2" data-active="false">
+        <div class="lab-mark"><span class="lab-name">丙</span></div>
+        <div class="lab-state"><span class="lab-dot" aria-hidden="true"></span><span data-state>未参加</span></div>
+        <span class="text-small text-muted">需另 2 人</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lab-footer">
+    <button type="button" class="btn btn-primary" data-step>运行一轮</button>
+    <span class="text-small text-muted">允许退出 · 无外力干预</span>
+  </div>
+  <div class="lab-details text-small" role="status" aria-live="polite" aria-atomic="true" data-detail>第 0 轮：甲、乙参加；丙未参加。</div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('three-person-lab');
+      const agents = Array.from(root.querySelectorAll('[data-agent]'));
+      const starters = Array.from(root.querySelectorAll('[data-start]'));
+      const roundLabel = root.querySelector('[data-round]');
+      const totalLabel = root.querySelector('[data-total]');
+      const detail = root.querySelector('[data-detail]');
+      const names = ['甲', '乙', '丙'];
+      let state = [true, true, false];
+      let initial = '110';
+      let round = 0;
+
+      function render(message) {
+        agents.forEach((agent, index) => {
+          agent.dataset.active = String(state[index]);
+          agent.querySelector('[data-state]').textContent = state[index] ? '参加' : '未参加';
+          agent.setAttribute('aria-label', names[index] + '：' + (state[index] ? '参加' : '未参加'));
+        });
+        roundLabel.textContent = '第 ' + round + ' 轮';
+        totalLabel.textContent = state.filter(Boolean).length + ' / 3 人参加';
+        starters.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.start === initial)));
+        detail.textContent = message;
+        root.dataset.state = state.map(Number).join('');
+        root.dataset.round = String(round);
+      }
+
+      starters.forEach(button => {
+        button.addEventListener('click', () => {
+          initial = button.dataset.start;
+          state = initial.split('').map(value => value === '1');
+          round = 0;
+          const joined = names.filter((_, index) => state[index]).join('、');
+          const waiting = names.filter((_, index) => !state[index]).join('、');
+          render('第 0 轮：' + joined + '参加；' + waiting + '未参加。');
+        });
+      });
+
+      root.querySelector('[data-step]').addEventListener('click', () => {
+        const reasons = [];
+        [1, 2].forEach(index => {
+          const others = state.reduce((count, active, otherIndex) => count + Number(active && otherIndex !== index), 0);
+          const before = state[index];
+          const after = others >= 2;
+          const action = after ? (before ? '留下' : '加入') : (before ? '退出' : '等待');
+          reasons.push(names[index] + '看到' + others + '人，' + action);
+          state[index] = after;
+        });
+        round += 1;
+        render('第 ' + round + ' 轮：' + reasons.join('；') + '。');
+      });
+
+      render('第 0 轮：甲、乙参加；丙未参加。');
+    })();
+  </script>
+</div>

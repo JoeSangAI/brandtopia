@@ -1,0 +1,68 @@
+{
+  "schema": "brandtopia.research-state.v1",
+  "as_of": "2026-11-22",
+  "project": "Brandtopia",
+  "status": "paused_by_owner",
+  "archive_scope": "Reconcile research to current conversation; verify and preserve existing examples; do not start next research.",
+  "entry_points": [
+    "README.md",
+    "START_HERE.md",
+    "docs/research/current-state.md",
+    "docs/research/2026-11-22-recap.md"
+  ],
+  "implemented_models": [
+    {
+      "id": "ABM-001",
+      "scope": "Synthetic deterministic awareness diffusion on a ten-agent ring",
+      "empirically_validated": false,
+      "record": "docs/experiments/abm-001-information-diffusion.md"
+    }
+  ],
+  "archived_chat_records": {
+    "prefix": "CHAT",
+    "first": 1,
+    "last": 21,
+    "topic_documents": 8,
+    "includes_unexecuted_proposals": true,
+    "index": "docs/experiments/index.md"
+  },
+  "preserved_interactive_demos": {
+    "count": 7,
+    "manifest": "artifacts/chat-demos/provenance.json",
+    "original_random_draw_history_recovered": false
+  },
+  "recalculation": {
+    "script": "scripts/verify_archived_calculations.py",
+    "result": "results/archive-calculations.json",
+    "synthetic": true
+  },
+  "next_candidate": {
+    "id": "CHAT-21",
+    "status": "not_started",
+    "trigger": "Resume only after the owner asks to continue research.",
+    "question": "In the public Task 3 data, does shortening available time from 2 seconds to 1 second increase the usual action when it is suboptimal?",
+    "paper": "https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1012057",
+    "public_repository": "https://github.com/lucylai96/simplepolicies",
+    "downloaded_for_analysis": false,
+    "replicated": false
+  },
+  "human_research": {
+    "status": "deferred_not_recruited",
+    "questionnaires_issued": false,
+    "collaborator_contacted": false,
+    "trigger": "Important mechanism or target-population parameter cannot be resolved from public evidence."
+  },
+  "deferred": [
+    "H02 multi-round network diffusion",
+    "Integrated ad-versus-discount model with consistent state transitions",
+    "TOM/category cue study",
+    "Empirical learning and memory parameters",
+    "Consumer model validation on held-out data"
+  ],
+  "governance": {
+    "public_repository": true,
+    "raw_private_traces_included": false,
+    "source_register": "docs/evidence/source-register.md",
+    "corrections": "docs/evidence/corrections.md"
+  }
+}

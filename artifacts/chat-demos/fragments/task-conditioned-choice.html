@@ -1,0 +1,88 @@
+<div id="bt-task-choice-v1">
+  <style>
+    #bt-task-choice-v1 { color: var(--foreground); }
+    #bt-task-choice-v1 .bt-heading { padding-inline-end: 92px; }
+    #bt-task-choice-v1 .bt-space { margin-block: 18px; }
+    #bt-task-choice-v1 .bt-fixed caption { text-align: start; padding-block-end: 8px; color: var(--foreground); font-weight: 500; }
+    #bt-task-choice-v1 .bt-reading { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-block: 12px; }
+    #bt-task-choice-v1 .bt-results { display: grid; gap: 16px; margin-block: 18px; }
+    #bt-task-choice-v1 .bt-bar-label { display: flex; justify-content: space-between; gap: 12px; margin-block-end: 6px; }
+    #bt-task-choice-v1 .bt-track { height: 22px; background: var(--muted); overflow: hidden; }
+    #bt-task-choice-v1 .bt-mark { height: 100%; transition: width 180ms ease-out; }
+    #bt-task-choice-v1 .bt-a { background: var(--viz-series-1); }
+    #bt-task-choice-v1 .bt-b { background: var(--viz-series-2); }
+    #bt-task-choice-v1 .bt-axis { display: flex; justify-content: space-between; gap: 8px; }
+    @media (prefers-reduced-motion: reduce) {
+      #bt-task-choice-v1 .bt-mark { transition: none; }
+    }
+  </style>
+
+  <h3 class="bt-heading">同一个人，只改变当次任务</h3>
+  <div class="text-small text-muted">假设数据 · 已决定购买，且只在 A、B 中选择</div>
+
+  <div class="bt-space">
+    <table class="table table-sm bt-fixed">
+      <caption>固定的主观评价（0–10 分）</caption>
+      <thead><tr><th scope="col">方案</th><th scope="col" class="text-end">去屑表现</th><th scope="col" class="text-end">香味满意度</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">A</th><td class="text-end">9</td><td class="text-end">5</td></tr>
+        <tr><th scope="row">B</th><td class="text-end">6</td><td class="text-end">8</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bt-space">
+    <label class="form-label" for="bt-task-choice-select-v1">当次任务</label>
+    <select class="form-select" id="bt-task-choice-select-v1">
+      <option value="0.8">去屑优先</option>
+      <option value="0.7">兼顾香味，仍以去屑为主</option>
+      <option value="0.2">香味优先</option>
+    </select>
+  </div>
+
+  <div class="bt-reading text-small">
+    <span>去屑权重 <span id="bt-task-wd-v1" class="tabular-nums">80%</span></span>
+    <span>香味权重 <span id="bt-task-wf-v1" class="tabular-nums">20%</span></span>
+  </div>
+
+  <div class="bt-results" role="group" aria-label="模型计算的条件选择概率，量尺为零到百分之一百">
+    <div>
+      <div class="bt-bar-label"><span>A 的选择概率</span><span id="bt-task-pa-v1" class="tabular-nums">85.8%</span></div>
+      <div class="bt-track" id="bt-task-meter-a-v1" role="meter" aria-label="A 的选择概率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="85.8"><div id="bt-task-bar-a-v1" class="bt-mark bt-a" style="width:85.81489351%"></div></div>
+    </div>
+    <div>
+      <div class="bt-bar-label"><span>B 的选择概率</span><span id="bt-task-pb-v1" class="tabular-nums">14.2%</span></div>
+      <div class="bt-track" id="bt-task-meter-b-v1" role="meter" aria-label="B 的选择概率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="14.2"><div id="bt-task-bar-b-v1" class="bt-mark bt-b" style="width:14.18510649%"></div></div>
+    </div>
+  </div>
+  <div class="bt-axis text-small text-muted" aria-hidden="true"><span>0%</span><span>条件选择概率</span><span>100%</span></div>
+  <div class="bt-reading text-small" aria-live="polite" aria-atomic="true" id="bt-task-detail-v1">任务匹配分：A 8.2，B 6.4；当前更倾向于 A。</div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('bt-task-choice-v1');
+      const get = name => root.querySelector('#bt-task-' + name + '-v1');
+      const task = get('choice-select');
+      const knowledge = Object.freeze({ A: Object.freeze([9, 5]), B: Object.freeze([6, 8]) });
+      function update() {
+        const weight = Number(task.value);
+        const scoreA = weight * knowledge.A[0] + (1 - weight) * knowledge.A[1];
+        const scoreB = weight * knowledge.B[0] + (1 - weight) * knowledge.B[1];
+        const probA = 1 / (1 + Math.exp(scoreB - scoreA));
+        const probB = 1 - probA;
+        get('wd').textContent = Math.round(weight * 100) + '%';
+        get('wf').textContent = Math.round((1 - weight) * 100) + '%';
+        get('pa').textContent = (probA * 100).toFixed(1) + '%';
+        get('pb').textContent = (probB * 100).toFixed(1) + '%';
+        get('bar-a').style.width = (probA * 100) + '%';
+        get('bar-b').style.width = (probB * 100) + '%';
+        get('meter-a').setAttribute('aria-valuenow', (probA * 100).toFixed(1));
+        get('meter-b').setAttribute('aria-valuenow', (probB * 100).toFixed(1));
+        const choice = Math.abs(probA - 0.5) < 1e-12 ? '两者倾向相同' : '当前更倾向于 ' + (probA > 0.5 ? 'A' : 'B');
+        get('detail').textContent = '任务匹配分：A ' + scoreA.toFixed(1) + '，B ' + scoreB.toFixed(1) + '；' + choice + '。';
+      }
+      task.addEventListener('change', update);
+      update();
+    })();
+  </script>
+</div>
