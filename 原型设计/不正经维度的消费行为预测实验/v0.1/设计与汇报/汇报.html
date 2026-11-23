@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>不正经维度的消费行为预测实验 · v0.1 汇报</title>
+<style>
+:root{--bg:#F7F4EE;--ink:#23262B;--sub:#5E646C;--accent:#2F5D50;--line:#E6E1D8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:1040px;margin:auto;padding:42px 24px 56px}
+header,section,details{border:1px solid var(--line);border-radius:16px;background:white;padding:24px 28px;margin-bottom:16px}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(27px,4vw,38px);line-height:1.28;margin-bottom:14px}
+h2{font-size:22px;margin-bottom:8px}
+h3{font-size:17px;margin-bottom:4px}
+p+p{margin-top:8px}
+a{color:var(--accent);text-underline-offset:3px}
+.button{display:inline-block;margin-top:17px;padding:9px 18px;border-radius:10px;background:var(--accent);color:white;text-decoration:none}
+.lead{font-size:18px}
+.muted{color:var(--sub)}
+.modules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.module{padding:16px;border:1px solid var(--line);border-radius:12px;background:#FCFAF5}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td,th{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--line)}
+th{color:var(--sub);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600}
+details p{margin-top:12px}
+ul{margin:8px 0 0;padding-left:22px}
+code{overflow-wrap:anywhere}
+@media(max-width:700px){main{padding:22px 14px}header,section,details{padding:18px}.modules{grid-template-columns:1fr}td,th{padding:7px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>不正经维度的消费行为预测实验</h1>
+  <p class="lead">v0.1 用闲聊整理一个人的生活偏好，再看模型和本人对十件商品的三档选择有多接近。</p>
+  <p class="muted">长远研究关注日常叙述中的信息能否帮助理解消费者。本版提供一条可在同一屏幕走完的试用流程。</p>
+  <a class="button" href="http://127.0.0.1:47623/">打开「聊聊你喜欢的事」</a>
+  <p class="muted">启动服务后可在本机试用。</p>
+  <div class="modules">
+    <div class="module"><h3>记录闲聊</h3><p>主持人可以打字或粘贴完整访谈，再确认封存。</p></div>
+    <div class="module"><h3>整理画像和预测</h3><p>封存后后台立即按话题整理并保存画像，接着预测十件商品。</p></div>
+    <div class="module"><h3>独立表态和揭晓</h3><p>受访者逐件选择并交卷，随后在十张卡里对照两边的结果。</p></div>
+  </div>
+</header>
+<section>
+  <h2>功能与实现状态</h2>
+  <table>
+    <thead><tr><th>功能</th><th>状态</th><th>实现范围</th></tr></thead>
+    <tbody>
+      <tr><td>访谈与封存</td><td>已实现</td><td>大文本框支持长段文字粘贴。沿用样稿四组话题，封存后开始预测。</td></tr>
+      <tr><td>双提示词后台</td><td>已实现</td><td>由服务端封存触发。事实白描整理访谈，再以保存的画像、示例商品和三档规则预测。</td></tr>
+      <tr><td>表态与回看</td><td>已实现</td><td>十件商品逐件选择，一览可改任意一件，也能从第一件重看。</td></tr>
+      <tr><td>结果封条与卡片</td><td>已实现</td><td>交卷后先致谢。点封条且结果就绪时揭晓，过早点击会保留封条。十卡逐件并列个人选择和模型猜测。</td></tr>
+      <tr><td>正式试验材料</td><td>待确认</td><td>本版采用样稿的十件示例商品、图标和三档题意。正式品项及资料由实验负责人确认。</td></tr>
+    </tbody>
+  </table>
+</section>
+<section>
+  <h2>人工验收</h2>
+  <table>
+    <thead><tr><th>可操作步骤</th><th>预期</th></tr></thead>
+    <tbody>
+      <tr><td>录入或粘贴长访谈并封存</td><td>直接进过渡。后台保存访谈并启动画像整理。</td></tr>
+      <tr><td>选择两件，点「上一件」并重新选择</td><td>可以修改已选档位，一览留有该次修改。</td></tr>
+      <tr><td>完成十件，点「提交我的选择」</td><td>先显示感谢与右侧封条，选择已经保存。</td></tr>
+      <tr><td>点右侧揭晓，再打开「访谈画像」</td><td>十件商品各显示本人和模型分档、差异及由访谈整理的文字。</td></tr>
+      <tr><td>在表态时刷新或在人机预测失败后重试</td><td>恢复本场选择。失败只在揭晓后提示，重试沿用封存材料和已保存画像。</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" id="test-status">本机用真实模型完成一轮合成访谈验收。核对了长文粘贴、表态回看和刷新恢复、交卷后封条、十件商品对照及保存的画像。</p>
+  <p class="muted">本轮用模拟网关核对了封存先返回、封存后无页面请求时仍能完成两步，以及重复提交只启动一份任务。</p>
+  <p class="muted">新版已私有发布。线上 Worker 的匿名 TokenDance 请求收到 HTTP 401，确认网关可达。原场次已生成并保存画像，商品预测曾触到后台时限。</p>
+  <p class="muted">关闭额外思考后，本机用同一份虚构访谈调用真实模型，两步共用 5.6 秒，返回五个画像栏目与十项选择。前端通过结果已完成、点得早和失败后三种封条场景测试。</p>
+  <p class="muted">用同一部署包在本机接入真实网关，封存响应返回后立即中止发起方的请求信号。后台在 6.6 秒内保存五个画像栏目和十项预测，早于任何商品表态提交。线上已确认新版前端、数据库绑定及网关连通。</p>
+  <p class="muted">一场线上合成测试用新版从已保存的画像继续，约 2.7 秒完成并保存十件商品的预测，对照接口随后返回成功。</p>
+  <p class="muted">原场次的画像步骤在出站前失败。新版使用 Worker 支持的重定向模式，后台也能区分网关跳转、鉴权响应和连接异常。<a href="https://developers.cloudflare.com/workers/runtime-apis/request/#options">Worker 请求选项</a></p>
+</section>
+<section>
+  <h2>主持人准备</h2>
+  <p><strong>忠实于材料，尽量做事实白描。</strong> 记录当事人实际讲过的细节、理由和情境，保留「有时」「很少」等限定。提交前略去收入、职业、消费观念、购买记录和具体商品的购买理由。</p>
+</section>
+<section>
+  <h2>提示词导航</h2>
+  <ul>
+    <li><a href="../原型/prompts/访谈画像.md">访谈画像</a> · 依据实际访谈话题整理，空的话题省略。</li>
+    <li><a href="../原型/prompts/商品偏好预测.md">商品偏好预测</a> · 用已保存的画像和商品资料预测每件的三档选择。</li>
+  </ul>
+</section>
+<details>
+  <summary>交互与上下文</summary>
+  <p>主持人封存闲聊后，后台立即生成并保存画像，再预测商品选择。页面继续表态，交卷后才与模型输出配对。预测失败可以在揭晓区按原材料重试。</p>
+  <p>真实模式通过 TokenDance 调用 <code>deepseek-v4.1-flash-1017</code>。两次模型请求各有独立提示词。服务端读取 Secret <code>TOKENDANCE_API_KEY</code>，线上场次自创建起可读取两小时。<a href="https://tokendance.space/docs/ai-integration.md">TokenDance 接入文档</a></p>
+</details>
+</main>
+</body>
+</html>
