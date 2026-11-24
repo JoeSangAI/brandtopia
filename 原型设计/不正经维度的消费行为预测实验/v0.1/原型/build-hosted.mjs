@@ -20,7 +20,7 @@ const prompts = {
 const imports = new Set([
   "import { portraitTopics } from './public/topics.mjs';",
   "import { scoreIsValid } from './experiment.mjs';",
-  "import { generateProfile, MODELS, predictRatings, probeGateway, PROMPT_VERSION } from '../prediction.mjs';",
+  "import { generateProfile, MODELS, predictRatings, PROMPT_VERSION } from '../prediction.mjs';",
   "import { chatLength, compareScores, experimentRating, minimumChatLength, normalizedScores, roundLabel } from '../experiment.mjs';"
 ]);
 function inlineModule(file) {

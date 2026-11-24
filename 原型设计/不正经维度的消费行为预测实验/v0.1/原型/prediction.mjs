@@ -26,22 +26,6 @@ function transportDetail(error, apiKey) {
     .replace(/https?:\/\/\S+/g, '[url]').replace(/\s+/g, ' ').slice(0, 180);
 }
 
-export async function probeGateway() {
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      redirect: 'manual',
-      headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(6000),
-      body: '{}'
-    });
-    await response.body?.cancel();
-    return { status: response.status };
-  } catch (error) {
-    return { error: transportDetail(error) };
-  }
-}
-
 function parseContent(content, requestId) {
   try {
     if (typeof content !== 'string') throw new Error();

@@ -1,4 +1,4 @@
-import { generateProfile, MODELS, predictRatings, probeGateway, PROMPT_VERSION } from '../prediction.mjs';
+import { generateProfile, MODELS, predictRatings, PROMPT_VERSION } from '../prediction.mjs';
 import { chatLength, compareScores, experimentRating, minimumChatLength, normalizedScores, roundLabel } from '../experiment.mjs';
 
 const holdMs = 2 * 60 * 60 * 1000;
@@ -6,6 +6,7 @@ const leaseMs = 35 * 1000;
 // An HTTP Worker's post-response work is limited to 30 seconds. Leave time
 // for D1 to save either the result or the timeout.
 const backgroundMs = 27 * 1000;
+const visitorPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 
 class HttpError extends Error {
   constructor(status, message) {
@@ -70,7 +71,7 @@ async function addRound(db, owner) {
   const now = Date.now();
   const label = roundLabel(id, new Date(now));
   await db.batch([
-    db.prepare('DELETE FROM rounds WHERE owner = ? AND expires_at <= ?').bind(owner, now),
+    db.prepare('DELETE FROM rounds WHERE expires_at <= ?').bind(now),
     db.prepare('INSERT INTO rounds (id, owner, label, expires_at, products_json, rating_json) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(id, owner, label, now + holdMs, JSON.stringify(hostedCatalog), JSON.stringify(experimentRating))
   ]);
@@ -194,21 +195,31 @@ async function performWork(db, owner, row, key, signal) {
 
 async function handleRequest(request, env, ctx) {
   try {
-    const { pathname, searchParams } = new URL(request.url);
+    const { pathname, origin } = new URL(request.url);
     const asset = request.method === 'GET' && hostedAssets[pathname];
     if (asset) return send(asset.content, asset.mime);
     if (request.method === 'GET' && pathname === '/api/health') {
-      const health = { version: 'v0.1', mode: 'tokendance', storageReady: Boolean(env.DB), modelReady: Boolean(env.TOKENDANCE_API_KEY) };
-      if (searchParams.get('gateway') === '1') health.gateway = await probeGateway();
-      return json(health);
+      return json({ version: 'v0.1', mode: 'tokendance', storageReady: Boolean(env.DB), modelReady: Boolean(env.TOKENDANCE_API_KEY) });
     }
-    const owner = request.headers.get('oai-authenticated-user-id');
-    if (!owner) throw new HttpError(401, '请登录有权访问此站点的账号。');
-    if (!env.DB || !env.TOKENDANCE_API_KEY) throw new HttpError(503, '站点的数据库或模型密钥尚未就绪。');
-    if (request.method === 'POST' && pathname === '/api/rounds') return json(await addRound(env.DB, owner), 201);
-
+    const creating = request.method === 'POST' && pathname === '/api/rounds';
     const route = pathname.match(/^\/api\/rounds\/([0-9a-f-]{36})(?:\/(chat|ratings|comparison|retry))?$/);
-    if (!route) throw new HttpError(404, '找不到该页面或测试。');
+    if (!creating && !route) throw new HttpError(404, '找不到该页面或测试。');
+    const source = request.headers.get('origin');
+    if (request.method === 'POST' && source && source !== origin) {
+      throw new HttpError(403, '请在试用页面内提交。');
+    }
+
+    const account = request.headers.get('oai-authenticated-user-id');
+    const presented = request.headers.get('x-brandtopia-visitor');
+    const visitor = visitorPattern.test(presented) ? presented : creating && !account ? crypto.randomUUID() : null;
+    const owner = visitor ? 'visitor:' + visitor : account;
+    if (!owner) throw new HttpError(401, '请从试用首页开始一场。');
+    if (!env.DB || !env.TOKENDANCE_API_KEY) throw new HttpError(503, '站点的数据库或模型密钥尚未就绪。');
+    if (creating) {
+      const round = await addRound(env.DB, owner);
+      return json(visitor ? { ...round, visitor } : round, 201);
+    }
+
     const [, id, action] = route;
     const row = await loadRound(env.DB, owner, id);
     if (!row) throw new HttpError(404, '这场临时测试已不可用。');

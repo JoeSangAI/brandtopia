@@ -16,7 +16,7 @@ const chineseTime = new Intl.DateTimeFormat('zh-CN', {
 });
 
 function blankDraft() {
-  return { id: null, screen: 'welcome', chat: '', topics: [], scores: {}, index: 0, review: false, edit: false };
+  return { id: null, visitor: null, screen: 'welcome', chat: '', topics: [], scores: {}, index: 0, review: false, edit: false };
 }
 
 function loadDraft() {
@@ -55,11 +55,13 @@ function escape(value) {
 }
 
 function request(path, body) {
-  return fetch(path, body === undefined ? {} : {
+  const options = body === undefined ? {} : {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
-  }).then(async response => {
+  };
+  if (draft.visitor) options.headers = { ...options.headers, 'X-Brandtopia-Visitor': draft.visitor };
+  return fetch(path, options).then(async response => {
     const result = await response.json();
     if (!response.ok) {
       const error = new Error(result.error || '暂时连不上，请再试一次。');
@@ -77,6 +79,7 @@ function roundUrl(suffix = '') {
 function useRound(next) {
   round = next;
   draft.id = next.id;
+  if (next.visitor) draft.visitor = next.visitor;
   if (next.stage === 'complete') {
     draft.screen = 'complete';
     draft.chat = '';
@@ -98,7 +101,7 @@ async function connect() {
       useRound(await request('/api/rounds/' + draft.id));
       return;
     } catch (error) {
-      if (error.status !== 404) throw error;
+      if (error.status !== 404 && error.status !== 401) throw error;
       draft = blankDraft();
     }
   }
