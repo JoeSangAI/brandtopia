@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>不正经维度的消费行为预测实验 · v0.1 汇报</title>
+<style>
+:root{--bg:#F7F4EE;--ink:#23262B;--sub:#5E646C;--accent:#2F5D50;--line:#E6E1D8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:1040px;margin:auto;padding:42px 24px 56px}
+header,section,details{border:1px solid var(--line);border-radius:16px;background:white;padding:24px 28px;margin-bottom:16px}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(27px,4vw,38px);line-height:1.28;margin-bottom:14px}
+h2{font-size:22px;margin-bottom:8px}
+h3{font-size:17px;margin-bottom:4px}
+p+p{margin-top:8px}
+a{color:var(--accent);text-underline-offset:3px}
+.button{display:inline-block;margin-top:17px;padding:9px 18px;border-radius:10px;background:var(--accent);color:white;text-decoration:none}
+.lead{font-size:18px}
+.muted{color:var(--sub)}
+.modules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.module{padding:16px;border:1px solid var(--line);border-radius:12px;background:#FCFAF5}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td,th{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--line)}
+th{color:var(--sub);font-weight:600}
+summary{cursor:pointer;color:var(--accent);font-weight:600}
+details p{margin-top:12px}
+ul{margin:8px 0 0;padding-left:22px}
+code{overflow-wrap:anywhere}
+.research-section h3{margin:26px 0 8px;font-size:19px}
+.formula{display:grid;grid-template-columns:28px minmax(0,1fr) 28px;align-items:center;margin:14px 0 16px;padding:14px 6px;background:#FCFAF5;border-block:1px solid var(--line)}
+.formula math{grid-column:2;font-size:clamp(15px,3.4vw,26px)}
+.equation-number{grid-column:3;justify-self:end;padding-inline-end:4px;font:16px Georgia,serif;color:var(--sub)}
+.research-section .module h4{margin:0 0 4px;font-size:16px}
+.research-questions{padding-left:1.6em}
+.research-questions li{padding-left:.25em;margin:0 0 12px}
+.research-questions li strong{display:block}
+.research-source{margin-top:20px;padding-top:12px;border-top:1px solid var(--line);font-size:14px}
+@media(max-width:700px){main{padding:22px 14px}header,section,details{padding:18px}.modules{grid-template-columns:1fr}td,th{padding:7px}}
+@media(max-width:400px){.formula{grid-template-columns:12px minmax(0,1fr) 24px}.equation-number{font-size:13px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>不正经维度的消费行为预测实验</h1>
+  <p class="lead">v0.1 用闲聊整理一个人的生活偏好，再看模型和本人对十件商品的三档选择有多接近。</p>
+  <p class="muted">长远研究关注日常叙述中的信息能否帮助理解消费者。本版提供一条可在同一屏幕走完的试用流程。</p>
+  <a class="button" href="https://brandtopia-chat-taste.ready-slug-6322.chatgpt.site">打开「聊聊你喜欢的事」</a>
+  <p class="muted">持链接可直接以访客身份试用。</p>
+  <p class="muted"><a href="http://127.0.0.1:47623/">本机试用</a>（需先启动服务） · <a href="#post-prototype">开发后思考</a></p>
+  <div class="modules">
+    <div class="module"><h3>记录闲聊</h3><p>主持人可以打字或粘贴完整访谈，再确认封存。</p></div>
+    <div class="module"><h3>整理画像和预测</h3><p>封存后后台立即按话题整理并保存画像，接着预测十件商品。</p></div>
+    <div class="module"><h3>独立表态和揭晓</h3><p>受访者逐件选择并交卷，随后在十张卡里对照两边的结果。</p></div>
+  </div>
+</header>
+<section>
+  <h2>功能与实现状态</h2>
+  <table>
+    <thead><tr><th>功能</th><th>状态</th><th>实现范围</th></tr></thead>
+    <tbody>
+      <tr><td>访谈与封存</td><td>已实现</td><td>大文本框支持长段文字粘贴。沿用样稿四组话题，封存后开始预测。</td></tr>
+      <tr><td>双提示词后台</td><td>已实现</td><td>由服务端封存触发。事实白描整理访谈，再以保存的画像、示例商品和三档规则预测。</td></tr>
+      <tr><td>表态与回看</td><td>已实现</td><td>十件商品逐件选择，一览可改任意一件，也能从第一件重看。</td></tr>
+      <tr><td>结果封条与卡片</td><td>已实现</td><td>交卷后先致谢。点封条且结果就绪时揭晓，过早点击会保留封条。十卡逐件并列个人选择和模型猜测。</td></tr>
+      <tr><td>正式试验材料</td><td>待确认</td><td>本版采用样稿的十件示例商品、图标和三档题意。正式品项及资料由实验负责人确认。</td></tr>
+    </tbody>
+  </table>
+</section>
+<section>
+  <h2>人工验收</h2>
+  <table>
+    <thead><tr><th>可操作步骤</th><th>预期</th></tr></thead>
+    <tbody>
+      <tr><td>录入或粘贴长访谈并封存</td><td>直接进过渡。后台保存访谈并启动画像整理。</td></tr>
+      <tr><td>选择两件，点「上一件」并重新选择</td><td>可以修改已选档位，一览留有该次修改。</td></tr>
+      <tr><td>完成十件，点「提交我的选择」</td><td>先显示感谢与右侧封条，选择已经保存。</td></tr>
+      <tr><td>点右侧揭晓，再打开「访谈画像」</td><td>十件商品各显示本人和模型分档、差异及由访谈整理的文字。</td></tr>
+      <tr><td>在表态时刷新或在人机预测失败后重试</td><td>恢复本场选择。失败只在揭晓后提示，重试沿用封存材料和已保存画像。</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" id="test-status">本机用真实模型完成一轮合成访谈验收。核对了长文粘贴、表态回看和刷新恢复、交卷后封条、十件商品对照及保存的画像。</p>
+  <p class="muted">本轮用模拟网关核对了封存先返回、封存后无页面请求时仍能完成两步，以及重复提交只启动一份任务。</p>
+  <p class="muted">此前私有试用时，线上 Worker 的匿名 TokenDance 请求收到 HTTP 401，确认网关可达。原场次已生成并保存画像，商品预测曾触到后台时限。</p>
+  <p class="muted">关闭额外思考后，本机用同一份虚构访谈调用真实模型，两步共用 5.6 秒，返回五个画像栏目与十项选择。前端通过结果已完成、点得早和失败后三种封条场景测试。</p>
+  <p class="muted">用同一部署包在本机接入真实网关，封存响应返回后立即中止发起方的请求信号。后台在 6.6 秒内保存五个画像栏目和十项预测，早于任何商品表态提交。线上已确认新版前端、数据库绑定及网关连通。</p>
+  <p class="muted">一场线上合成测试用新版从已保存的画像继续，约 2.7 秒完成并保存十件商品的预测，对照接口随后返回成功。</p>
+  <p class="muted">原场次的画像步骤在出站前失败。新版使用 Worker 支持的重定向模式，后台也能区分网关跳转、鉴权响应和连接异常。<a href="https://developers.cloudflare.com/workers/runtime-apis/request/#options">Worker 请求选项</a></p>
+  <p class="muted">公开试用已用两个未登录会话验证。各自可创建场次，记录按会话隔离。用同一份虚构访谈调用真实 DeepSeek，已得到十件商品的对照结果。</p>
+</section>
+<section>
+  <h2>主持人准备</h2>
+  <p><strong>忠实于材料，尽量做事实白描。</strong> 记录当事人实际讲过的细节、理由和情境，保留「有时」「很少」等限定。提交前略去收入、职业、消费观念、购买记录和具体商品的购买理由。</p>
+</section>
+<section>
+  <h2>提示词导航</h2>
+  <ul>
+    <li><a href="../原型/prompts/访谈画像.md">访谈画像</a> · 依据实际访谈话题整理，空的话题省略。</li>
+    <li><a href="../原型/prompts/商品偏好预测.md">商品偏好预测</a> · 用已保存的画像和商品资料预测每件的三档选择。</li>
+  </ul>
+</section>
+<details>
+  <summary>交互与上下文</summary>
+  <p>主持人封存闲聊后，后台立即生成并保存画像，再预测商品选择。页面继续表态，交卷后才与模型输出配对。预测失败可以在揭晓区按原材料重试。</p>
+  <p>真实模式通过 TokenDance 调用 <code>deepseek-v4.1-flash-1017</code>。两次模型请求各有独立提示词。服务端读取 Secret <code>TOKENDANCE_API_KEY</code>，线上场次自创建起可读取两小时。<a href="https://tokendance.space/docs/ai-integration.md">TokenDance 接入文档</a></p>
+</details>
+<section class="research-section" id="post-prototype" aria-labelledby="post-prototype-title">
+  <h2 id="post-prototype-title">开发后思考</h2>
+  <p class="lead">做完原型后，可以把消费者智能体的最小建模单位写成一次具体响应。给定同一个人和一个明确情境，模型如何在可能的反应之间分配概率？</p>
+
+  <h3>单次决策的表达</h3>
+  <div class="formula">
+    <math display="block" aria-label="给定 Persona 和情境的行为概率分布，等于大语言模型处理这两项输入的输出">
+      <mrow>
+        <msub><mi mathvariant="bold">p</mi><mi>θ</mi></msub>
+        <mo>(</mo><mo>·</mo><mo>∣</mo><msub><mi>P</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>,</mo><mi>s</mi><mo>)</mo>
+        <mo>=</mo><msub><mtext>LLM</mtext><mi>θ</mi></msub><mo>(</mo>
+        <msub><mi>P</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>,</mo><mi>s</mi><mo>)</mo>
+      </mrow>
+    </math>
+    <span class="equation-number" aria-hidden="true">(1)</span>
+  </div>
+  <p><strong>两项输入。</strong> <var>P</var><sub>i,t</sub> 是第 <var>i</var> 位消费者在时点 <var>t</var> 的上下文集合，也就是 Persona。<var>s</var> 是当前要求他响应的情境，可以是看到一条广告、在给定价格下几选一，也可以是只看到一件商品然后表态。这里的「决策」包含态度和反应。<var>θ</var> 表示使用的模型及其调用配置。</p>
+  <p><strong>一组输出。</strong> 对情境 <var>s</var> 允许的每种反应 <var>a</var>，分布给出一个 <var>p</var><sub>a</sub>。各项概率非负，合计为 1。先定义有哪些可观察的反应，再讨论模型把多少概率分给每一项。</p>
+
+  <h3>把 Persona 拆成三个上下文集合</h3>
+  <div class="formula">
+    <math display="block" aria-label="Persona 由个人基础、品类和品牌关系、环境因素三个部分组成">
+      <mrow>
+        <msub><mi>P</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub>
+        <mo>=</mo><mo>(</mo>
+        <msub><mi>U</mi><mi>i</mi></msub><mo>,</mo>
+        <msub><mi>B</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>,</mo>
+        <msub><mi>E</mi><mrow><mi>i</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>)</mo>
+      </mrow>
+    </math>
+    <span class="equation-number" aria-hidden="true">(2)</span>
+  </div>
+  <div class="modules">
+    <div class="module"><h4><var>U</var><sub>i</sub> · 个人基础</h4><p>相对稳定的成长经历、习惯和偏好。人口统计信息可作为后续输入条件。本版从日常和兴趣访谈取材。</p></div>
+    <div class="module"><h4><var>B</var><sub>i,t</sub> · 品类和品牌关系</h4><p>消费者与模拟范围内的品类及品牌怎样相处。一次好体验可能加强关系，一次坏体验可能让人疏远。</p></div>
+    <div class="module"><h4><var>E</var><sub>i,t</sub> · 环境因素</h4><p>决策前已发生的品牌外部事件和当下处境。比如一次险情可能改变接下来考虑保险时的关注点。</p></div>
+  </div>
+  <p>一次险情属于先前环境 <var>E</var><sub>i,t</sub>，随后摆到面前的一份保险方案是这次要响应的情境 <var>s</var>。这个区分让同一 Persona 可以保留原状，然后依次面对不同情境。</p>
+
+  <h3>v0.1 实际走通的一步</h3>
+  <p>虚构访谈先按实际话题做事实白描，得到一份以生活经历和偏好为主的画像。模型拿到画像和十件商品资料后，逐件给出一个档位。参与者独立选择，双方使用「想要」「无感」「不想要」三档，交卷后按商品配对。</p>
+  <p>这条链路目前记录的是每件商品的单次选档。三档各自的概率、这些概率的稳定性，以及对真人表态的预测表现，都留给后续检验。</p>
+
+  <h3>五个后续检验方向</h3>
+  <ol class="research-questions">
+    <li><strong>换 Persona 的来源</strong> 在同样的话题、商品和评分口径下比较合成访谈与真实访谈，观察画像里的线索怎样变化。对真实样本，用受访者独立提交的表态核对预测。</li>
+    <li><strong>同样输入，多跑几次</strong> 固定 Persona、决策情境、模型和调用配置，比较多次输出的稳定性。沿用当前三档选项时，可以先统计各档的出现频率。</li>
+    <li><strong>同一个人，换一个情境</strong> 固定 Persona 和模型，让同一个人面对一组相关情境。事先写清哪些反应应该延续、哪些变化有情境依据，再观察跨情境的反应是否像来自同一个人。</li>
+    <li><strong>同样的测试，换模型</strong> 沿用输入内容、商品、输出口径和核对方式，比较不同语言模型，也可以加入轻量决策模型。分别看预测表现、重复稳定性和运行开销。</li>
+    <li><strong>从个体推到群体</strong> 让一组具有不同 Persona 的个体面对共同情境，观察个体响应聚合后会呈现什么。群体如何组成、加入什么互动、品牌关系如何更新，留待下一轮明确。</li>
+  </ol>
+
+  <p class="muted research-source">整理自 2026-11-24 的原型开发复盘。</p>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聊聊你喜欢的事 · 实验原型 v1</title>
+<style>
+:root{
+  --bg:#F7F4EE;--card:#FFFFFF;--ink:#23262B;--sub:#6B7078;--line:#E6E1D8;
+  --pri:#2F5D50;--pri-h:#264C42;
+  --want:#D9763C;--neu:#8C9198;--not:#4F6D8F;
+  --ok:#2F7D5B;--mid:#C4912B;--opp:#B5523F;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:18px;line-height:1.6}
+body{min-height:100vh;display:flex;flex-direction:column}
+.progress{display:flex;justify-content:center;gap:32px;padding:16px;border-bottom:1px solid var(--line);font-size:15px;color:var(--sub)}
+.progress .cur{color:var(--pri);font-weight:600}
+main{flex:1;padding:40px 24px 24px;display:flex;justify-content:center}
+#app{width:100%;display:flex;justify-content:center}
+.screen{width:100%;display:flex;justify-content:center}
+.screen.enter{animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.wrap{width:100%;margin:0 auto}
+.w960{max-width:960px}
+.w640{max-width:640px}
+.center{text-align:center}
+h1{font-size:32px;font-weight:600;line-height:1.4;margin:0 0 16px}
+h2{font-size:22px;font-weight:600;margin:0 0 14px;line-height:1.4}
+p{margin:0}
+.lead{font-size:18px;margin-bottom:14px}
+.muted{font-size:15px;color:var(--sub)}
+.small{font-size:13px;color:var(--sub);margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px}
+.hostbar{display:flex;justify-content:flex-end;align-items:center;gap:10px;font-size:13px;color:var(--sub);margin-bottom:14px}
+.host-tag{border:1px solid var(--pri);border-radius:999px;padding:1px 10px;color:var(--pri)}
+.demo-tag{display:inline-block;font-size:12px;color:var(--sub);border:1px dashed #CFC8BB;border-radius:6px;padding:1px 8px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+.btn-primary{height:52px;padding:0 32px;border-radius:12px;border:0;background:var(--pri);color:#fff;font-family:inherit;font-size:18px;cursor:pointer}
+.btn-primary:hover{background:var(--pri-h)}
+.btn-primary:disabled{background:var(--line);color:var(--sub);cursor:not-allowed}
+.btn-ghost{height:44px;padding:0 24px;border-radius:12px;border:1px solid var(--pri);background:#fff;color:var(--pri);font-family:inherit;font-size:16px;cursor:pointer}
+.btn-ghost:hover{background:#F2F6F4}
+.link{background:none;border:0;padding:4px;color:var(--sub);font-family:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
+.textbtn{background:none;border:0;padding:6px 0;color:var(--sub);font-family:inherit;font-size:15px;cursor:pointer}
+.textbtn:hover{color:var(--ink)}
+.actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:24px}
+.actions.center{justify-content:center}
+.actions.between{justify-content:space-between}
+.tip{background:#FBF3E4;color:#7A5A1E;border-radius:12px;padding:12px 16px;font-size:15px;margin-bottom:16px}
+
+/* 第2屏 */
+.cols{display:grid;grid-template-columns:1fr 1.35fr;gap:20px}
+.topic{position:relative;border:1px solid var(--line);border-radius:12px;padding:14px 40px 14px 16px;margin-bottom:10px;background:#fff;cursor:pointer}
+.topic .tt{font-weight:600;font-size:16px}
+.topic .tq{font-size:15px;color:var(--sub);line-height:1.6}
+.topic.done{opacity:.5}
+.topic .ck{position:absolute;right:14px;top:14px;color:var(--pri);display:none;font-weight:700}
+.topic.done .ck{display:block}
+textarea{width:100%;min-height:360px;border:1px solid var(--line);border-radius:12px;padding:14px;font-family:inherit;font-size:16px;line-height:1.6;color:var(--ink);background:#fff;resize:vertical;outline:none}
+textarea:focus{border-color:var(--pri)}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:15px;color:var(--sub)}
+
+/* 第3屏 */
+.blocks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}
+.blk{border:1px solid var(--line);border-radius:16px;padding:18px 14px;background:#fff;text-align:center}
+.blk b{display:block;font-size:18px;color:var(--c);margin-bottom:4px}
+.blk span{font-size:15px;color:var(--sub)}
+
+/* 第4屏 */
+.rowbar{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--sub);margin-bottom:16px}
+.dots{display:flex;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);background:#EFEBE3}
+.dot.done{background:var(--pri);border-color:var(--pri)}
+.dot.cur{background:#fff;border-color:var(--pri)}
+.item{max-width:420px;margin:0 auto;text-align:center;padding:24px}
+.pic{aspect-ratio:4/3;background:#F3EFE7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:72px;margin-bottom:18px}
+.pname{font-size:28px;font-weight:600;line-height:1.4;margin-bottom:6px}
+.pdesc{font-size:18px;color:var(--sub);line-height:1.6}
+.q{font-size:18px;text-align:center;margin:24px 0 0}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.choice{height:88px;border-radius:16px;border:2px solid var(--c);background:#fff;color:var(--ink);font-family:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:8px;gap:2px}
+.choice .lab{font-size:18px;font-weight:600;color:var(--c)}
+.choice .sub{font-size:15px;color:var(--sub)}
+.choice.on{background:var(--c)}
+.choice.on .lab,.choice.on .sub{color:#fff}
+.item-foot{min-height:40px;margin-top:12px;display:flex;justify-content:flex-start}
+.ov{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:18px}
+.ovc{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 8px;min-height:138px;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;color:var(--ink);cursor:pointer}
+.ovc .ic{font-size:30px;line-height:1.2}
+.ovc .nm{font-size:15px;line-height:1.4}
+.ovc .tg{margin-top:auto;font-size:13px;padding:2px 10px;border-radius:999px;color:#fff;background:var(--c)}
+.ovc.miss{border:2px dashed var(--sub);color:var(--sub)}
+.ovc.miss .tg{background:none;color:var(--sub);padding:0}
+.warn{font-size:15px;color:var(--opp);text-align:center;margin-top:14px}
+
+/* 第5屏 */
+.check{width:64px;height:64px;margin:0 auto 16px;display:block}
+.cmp{margin-top:40px;max-width:960px;width:100%}
+.concl{font-size:28px;font-weight:600;line-height:1.5}
+.ref{font-size:15px;color:var(--sub);margin-top:6px}
+.counts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+.cnt{border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center;background:#fff}
+.cnt .n{font-size:30px;font-weight:600;color:var(--c)}
+.cnt .l{font-size:15px;color:var(--sub)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{font-size:13px;color:var(--sub);font-weight:400;text-align:left;padding:10px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.mis td{background:#F3EEE4}
+.ptag{display:inline-block;border-radius:8px;padding:2px 12px;color:#fff;background:var(--c);font-size:14px}
+.rel{display:inline-flex;align-items:center;gap:6px}
+.rel i{display:inline-block;width:10px;height:10px;border-radius:50%}
+.diffnum{font-size:13px;color:var(--sub);margin-left:8px}
+.status{display:flex;align-items:center;gap:10px;font-size:18px;padding:24px 0}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--line);border-top-color:var(--pri);border-radius:50%;animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.prof{margin-top:22px}
+.profbody{margin-top:12px;padding:20px}
+.profbody p{font-size:16px;line-height:1.8;margin-bottom:10px}
+.meta{font-size:13px;color:var(--sub);line-height:1.7;margin-top:6px}
+.foot{text-align:center;padding:16px 16px 24px}
+
+/* 弹窗 */
+.overlay{position:fixed;inset:0;background:rgba(35,38,43,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
+.dialog{background:#fff;border-radius:16px;padding:28px;max-width:420px;width:100%}
+.dialog h3{margin:0 0 10px;font-size:20px;font-weight:600}
+.dialog p{margin:0 0 22px;color:var(--sub);font-size:16px}
+.dlg-actions{display:flex;justify-content:flex-end;gap:10px}
+
+@media (max-width:760px){
+  .cols{grid-template-columns:1fr}
+  .ov{grid-template-columns:repeat(2,1fr)}
+  .progress{gap:16px;font-size:14px}
+  .blocks{grid-template-columns:repeat(3,1fr);gap:8px}
+  .blk{padding:12px 8px}
+  .choices{gap:8px}
+  .choice .sub{font-size:13px}
+  .counts{gap:8px}
+  .concl{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<main><div id="app"></div></main>
+<footer class="foot"><button class="link" data-act="reset">重新开始一场</button></footer>
+
+<script>
+(function(){
+'use strict';
+
+const KEY = 'chat-taste-proto-v1';
+const EXAMPLE = '周末基本都在家，和爱人一起做饭，我负责切菜和洗碗。最喜欢的是周日早上慢慢煮一锅粥，边煮边听播客。电影里隔一阵会重看《海街日记》，喜欢它什么大事都没发生，但每个人都被好好照顾到了。小说常翻的是汪曾祺的散文，写吃的那几篇看了很多遍。游戏玩得不多，但《星露谷物语》断断续续玩了好几年，喜欢按自己的节奏种地，不用和谁比。小时候暑假住在外婆家，每天下午帮外婆择菜，听她讲街坊的事，现在想起来觉得那是最踏实的一段日子。';
+const ITEMS = [
+  {name:'最新款 iPhone', desc:'一部新的智能手机。', icon:'📱'},
+  {name:'大疆 Pocket 口袋相机', desc:'一台可以单手握着拍视频的小相机。', icon:'📷'},
+  {name:'任天堂 Switch 游戏机', desc:'一台可以拿在手里玩、也能接电视玩的游戏机。', icon:'🎮'},
+  {name:'乐高成人向积木套装', desc:'一盒需要花几个晚上慢慢拼完的积木。', icon:'🧱'},
+  {name:'电纸书阅读器', desc:'一块专门用来看书的墨水屏设备。', icon:'📖'},
+  {name:'戴森吹风机', desc:'一支高速吹风机。', icon:'💨'},
+  {name:'lululemon 运动裤', desc:'一条运动和日常都能穿的裤子。', icon:'👖'},
+  {name:'泡泡玛特盲盒', desc:'一个拆开前不知道是哪一款的潮流玩偶。', icon:'🧸'},
+  {name:'手冲咖啡入门套装', desc:'一套在家自己冲咖啡的器具，含手冲壶、滤杯和磨豆器。', icon:'☕'},
+  {name:'露营折叠椅', desc:'一把可以收进袋子里带出门的椅子。', icon:'🪑'}
+];
+const PRED = ['neutral','want','want','want','want','neutral','neutral','not','want','neutral'];
+const SCORE = {want:1, neutral:0, not:-1};
+const LBL = {want:'想要', neutral:'无感', not:'不想要'};
+const COL = {want:'#D9763C', neutral:'#8C9198', not:'#4F6D8F'};
+const SUBL = {want:'有的话会开心', neutral:'有没有都行', not:'送我也不太想留'};
+const REL = ['一致','差一档','方向相反'];
+const RC = ['#2F7D5B','#C4912B','#B5523F'];
+const STEPS = ['开场','闲聊','过渡','表态','完成'];
+const TOPICS = [
+  {t:'日常和家庭生活', q:'平时和家人一起做什么？哪件小事是你一想到就觉得有意思的？'},
+  {t:'电影和小说', q:'有没有一部你隔一阵就会想起来的电影或小说？哪一点让你喜欢？'},
+  {t:'游戏和爱好', q:'你会反复玩什么游戏，或者一直做什么事？哪部分让你愿意再回来？'},
+  {t:'成长经历', q:'小时候有没有一件常做的事，或者一个你现在还记得的经历？它对你有什么意思？'}
+];
+const PROFILE = '这位参与者偏好慢节奏、可重复、能按自己步调进行的活动，看重日常里的照顾与陪伴，对竞争和比较兴趣不大。对食物和家庭场景有持续的关注，喜欢叙事平缓、细节丰富的作品。';
+
+const $ = id => document.getElementById(id);
+let predTimer = null, advTimer = null, profileOpen = false, lastScreen = 0;
+
+function p2(n){ return String(n).padStart(2,'0'); }
+function newId(){
+  const d = new Date();
+  const ds = d.getFullYear() + p2(d.getMonth()+1) + p2(d.getDate());
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i=0;i<4;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return 'T-' + ds + '-' + s;
+}
+function defaultState(){
+  return {
+    testId: newId(), screen: 1, chat: '', topicsDone: [false,false,false,false],
+    chatSealedAt: null, sel: Array(10).fill(null), index: 0, ret: null,
+    pendingAdvance: false, submittedAt: null, pred: null, revealed: false
+  };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if (raw) return Object.assign(defaultState(), JSON.parse(raw));
+  }catch(e){}
+  return defaultState();
+}
+let st = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(st)); }catch(e){} }
+function fmt(ts){
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+' '+p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
+}
+function chatLen(){ return st.chat.replace(/\s/g,'').length; }
+function firstMissing(){ return st.sel.indexOf(null); }
+function hostBar(){
+  return '<div class="hostbar"><span class="host-tag">主持人</span><span>' + st.testId + '</span></div>';
+}
+function fmtD(d){ return d > 0 ? '+' + d : (d < 0 ? '\u2212' + Math.abs(d) : '0'); }
+
+/* ---------- 预测 ---------- */
+function schedulePred(){
+  clearTimeout(predTimer);
+  const p = st.pred;
+  if (!p || p.status !== 'pending') return;
+  const remain = Math.max(0, p.startedAt + p.duration - Date.now());
+  predTimer = setTimeout(function(){
+    if (st.pred && st.pred.status === 'pending'){
+      st.pred.status = 'done';
+      st.pred.doneAt = Date.now();
+      save();
+      render();
+    }
+  }, remain);
+}
+function startPred(duration){
+  clearTimeout(predTimer);
+  st.pred = {status:'pending', startedAt: Date.now(), duration: duration, doneAt: null};
+  save();
+  schedulePred();
+}
+
+/* ---------- 弹窗 ---------- */
+function confirmBox(title, body, cancelText, okText, onOk){
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML = '<div class="dialog" role="dialog" aria-modal="true"><h3>'+title+'</h3><p>'+body+'</p><div class="dlg-actions"><button class="btn-ghost" data-x="cancel">'+cancelText+'</button><button class="btn-primary" data-x="ok">'+okText+'</button></div></div>';
+  document.body.appendChild(ov);
+  function close(){ ov.remove(); }
+  ov.addEventListener('click', function(e){
+    const x = e.target.getAttribute && e.target.getAttribute('data-x');
+    if (x === 'ok'){ close(); onOk(); }
+    else if (x === 'cancel' || e.target === ov){ close(); }
+  });
+}
+
+/* ---------- 渲染 ---------- */
+function render(){
+  const enter = st.screen !== lastScreen;
+  lastScreen = st.screen;
+  $('progress').innerHTML = STEPS.map(function(s,i){
+    return '<span class="'+(i===st.screen-1?'cur':'')+'">'+s+'</span>';
+  }).join('');
+  let html = '';
+  if (st.screen === 1) html = s1();
+  else if (st.screen === 2) html = s2();
+  else if (st.screen === 3) html = s3();
+  else if (st.screen === 4) html = st.index < 10 ? itemView() : overviewView();
+  else html = s5();
+  $('app').innerHTML = '<div class="screen '+(enter?'enter':'')+'">'+html+'</div>';
+  if (st.screen === 2){
+    const ta = $('chatInput');
+    ta.value = st.chat;
+    updateChatUI();
+  }
+}
+
+function s1(){
+  return '<section class="wrap w960">' + hostBar() +
+    '<div class="card" style="padding:40px">' +
+    '<h1>聊聊你喜欢的事</h1>' +
+    '<p class="lead">你平时喜欢看什么、玩什么？也可以聊聊家里的日常，或者一件你从小就喜欢做的事。挑你愿意分享的说就好。聊完后，再凭自己的感受看几件东西。</p>' +
+    '<p class="muted">系统会根据我们聊的内容，猜一猜你对这几件东西的态度，之后和你自己的选择对照着看。</p>' +
+    '<div class="actions"><button class="btn-primary" data-act="startChat">开始聊</button></div>' +
+    '</div></section>';
+}
+
+function s2(){
+  const topics = TOPICS.map(function(t,i){
+    return '<div class="topic '+(st.topicsDone[i]?'done':'')+'" data-act="topic" data-i="'+i+'" role="button" tabindex="0">' +
+      '<div class="tt">'+(i+1)+'. '+t.t+'</div><div class="tq">'+t.q+'</div><span class="ck">✓</span></div>';
+  }).join('');
+  return '<section class="wrap w960">' + hostBar() +
+    '<div class="cols">' +
+      '<div class="card"><h2>可以顺着聊的话题</h2>' + topics +
+      '<p class="small">不想聊的题可以跳过。</p></div>' +
+      '<div class="card"><h2>送入预测的闲聊文字</h2>' +
+      '<div class="tip">提交前请略去这些内容：收入、职业、消费观念、购买记录、买或不买某件东西的理由。</div>' +
+      '<textarea id="chatInput" rows="14" placeholder="把这次闲聊的文字整理后粘贴或录入在这里。"></textarea>' +
+      '<div class="row"><span id="chatCount"></span><button class="link" data-act="fillExample">填入示例文字（演示用）</button></div>' +
+      '<div class="actions between"><span id="chatHint" class="muted"></span>' +
+      '<button id="submitChat" class="btn-primary" data-act="submitChat">提交闲聊记录</button></div>' +
+      '</div>' +
+    '</div></section>';
+}
+
+function updateChatUI(){
+  const n = chatLen();
+  const cnt = $('chatCount'), hint = $('chatHint'), btn = $('submitChat');
+  if (cnt) cnt.textContent = '已记 ' + n + ' 字';
+  const ok = n >= 100;
+  if (btn) btn.disabled = !ok;
+  if (hint) hint.textContent = ok ? '' : '再多记一点，至少 100 字';
+}
+
+function s3(){
+  return '<section class="wrap w640 center">' +
+    '<h1>聊得很开心，谢谢你。</h1>' +
+    '<p class="lead">接下来给你看 10 件东西。单看东西本身，先不管价格，凭第一感觉选就好。</p>' +
+    '<div class="blocks">' +
+      '<div class="blk" style="--c:'+COL.want+'"><b>想要</b><span>有的话会开心</span></div>' +
+      '<div class="blk" style="--c:'+COL.neutral+'"><b>无感</b><span>有没有都行</span></div>' +
+      '<div class="blk" style="--c:'+COL.not+'"><b>不想要</b><span>送我也不太想留</span></div>' +
+    '</div>' +
+    '<p class="muted">没有对错，也不用想太久。</p>' +
+    '<div class="actions center"><button class="btn-primary" data-act="startRate">开始看</button></div>' +
+    '</section>';
+}
+
+function dotsHTML(){
+  let h = '<div class="dots">';
+  for (let j=0;j<10;j++){
+    let c = 'dot';
+    if (j === st.index) c += ' cur';
+    else if (st.sel[j]) c += ' done';
+    h += '<span class="'+c+'"></span>';
+  }
+  return h + '</div>';
+}
+
+function itemView(){
+  const i = st.index, it = ITEMS[i], cur = st.sel[i];
+  const choices = ['want','neutral','not'].map(function(k){
+    return '<button class="choice '+(cur===k?'on':'')+'" style="--c:'+COL[k]+'" data-act="pick" data-v="'+k+'">' +
+      '<span class="lab">'+LBL[k]+'</span><span class="sub">'+SUBL[k]+'</span></button>';
+  }).join('');
+  return '<section class="wrap w640">' +
+    '<div class="rowbar"><span>第 '+(i+1)+' 件 / 共 10 件</span>'+dotsHTML()+'</div>' +
+    '<div class="card item"><div class="pic"><span>'+it.icon+'</span></div>' +
+      '<div class="pname">'+it.name+'</div><div class="pdesc">'+it.desc+'</div></div>' +
+    '<p class="q">单看这件东西本身，先不管价格，你想要它吗？</p>' +
+    '<div class="choices">'+choices+'</div>' +
+    '<div class="item-foot">' + (i>0 ? '<button class="textbtn" data-act="prev">上一件</button>' : '') + '</div>' +
+    '</section>';
+}
+
+function overviewView(){
+  const miss = firstMissing();
+  const all = miss === -1;
+  const cards = ITEMS.map(function(it,i){
+    const v = st.sel[i];
+    if (!v){
+      return '<button class="ovc miss" data-act="edit" data-i="'+i+'"><span class="ic">'+it.icon+'</span><span class="nm">'+it.name+'</span><span class="tg">还没选</span></button>';
+    }
+    return '<button class="ovc" data-act="edit" data-i="'+i+'"><span class="ic">'+it.icon+'</span><span class="nm">'+it.name+'</span><span class="tg" style="--c:'+COL[v]+'">'+LBL[v]+'</span></button>';
+  }).join('');
+  const submitted = !!st.submittedAt;
+  return '<section class="wrap w640 center">' +
+    '<h2>看一眼，没问题就提交</h2>' +
+    '<div class="rowbar" style="justify-content:center;gap:16px"><span>一览 · 共 10 件</span>'+dotsHTML()+'</div>' +
+    (all ? '' : '<p class="warn">还差第 '+(miss+1)+' 件</p>') +
+    '<div class="ov">'+cards+'</div>' +
+    '<div class="actions center"><button class="btn-primary" data-act="submitRate" '+((!all||submitted)?'disabled':'')+'>'+(submitted?'已提交':'提交我的选择')+'</button></div>' +
+    '</section>';
+}
+
+function calc(){
+  const cnt = [0,0,0];
+  const rows = ITEMS.map(function(it,i){
+    const a = st.sel[i] || 'neutral';
+    const b = PRED[i];
+    const d = SCORE[b] - SCORE[a];
+    const k = Math.abs(d);
+    cnt[k]++;
+    return {it:it, a:a, b:b, d:d, k:k};
+  });
+  return {cnt:cnt, rows:rows};
+}
+
+function s5(){
+  const top = '<section class="wrap w640 center">' +
+    '<svg class="check" viewBox="0 0 64 64" fill="none" stroke="#2F5D50" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="28"/><path d="M20 33l8 8 16-17"/></svg>' +
+    '<h1>已经记下了，谢谢你。</h1>' +
+    '<p class="lead">今天聊得很愉快。</p>' +
+    '<div class="actions center"><button class="btn-ghost" data-act="toggleReveal">'+(st.revealed?'收起对照':'查看对照（主持人）')+'</button></div>' +
+    '</section>';
+  if (!st.revealed) return top;
+  return top + '<section class="wrap cmp card">' + hostBar() + compareHTML() + '</section>';
+}
+
+function compareHTML(){
+  const p = st.pred;
+  if (!p || p.status === 'pending'){
+    return '<p class="status"><span class="spinner"></span>模型还在猜，稍等一下</p>' +
+      '<p><button class="link" data-act="failPred">模拟预测失败</button></p>';
+  }
+  if (p.status === 'failed'){
+    return '<p class="status" style="padding-top:8px">这次没猜出来。你的选择已经保存好了。</p>' +
+      '<div class="actions" style="justify-content:flex-start"><button class="btn-primary" data-act="retryPred">按原材料重试</button></div>';
+  }
+  const res = calc();
+  const cnt = res.cnt, rows = res.rows;
+  const table = rows.map(function(r){
+    return '<tr class="'+(r.k?'mis':'')+'">' +
+      '<td>'+r.it.icon+' '+r.it.name+'</td>' +
+      '<td><span class="ptag" style="--c:'+COL[r.a]+'">'+LBL[r.a]+'</span></td>' +
+      '<td><span class="ptag" style="--c:'+COL[r.b]+'">'+LBL[r.b]+'</span></td>' +
+      '<td><span class="rel"><i style="background:'+RC[r.k]+'"></i>'+REL[r.k]+'</span><span class="diffnum">'+fmtD(r.d)+'</span></td>' +
+      '</tr>';
+  }).join('');
+  return '<div class="concl">10 件里，猜中了 '+cnt[0]+' 件。<span class="demo-tag">演示数据，未接入真实模型</span></div>' +
+    '<div class="ref">参照线：三档随机猜大约中 3 件。</div>' +
+    '<div class="counts">' +
+      '<div class="cnt" style="--c:'+RC[0]+'"><div class="n">'+cnt[0]+'</div><div class="l">一致 '+cnt[0]+' 件</div></div>' +
+      '<div class="cnt" style="--c:'+RC[1]+'"><div class="n">'+cnt[1]+'</div><div class="l">差一档 '+cnt[1]+' 件</div></div>' +
+      '<div class="cnt" style="--c:'+RC[2]+'"><div class="n">'+cnt[2]+'</div><div class="l">方向相反 '+cnt[2]+' 件</div></div>' +
+    '</div>' +
+    '<div class="tbl-wrap"><table><thead><tr><th>商品</th><th>本人选择</th><th>模型预测</th><th>差异</th></tr></thead><tbody>'+table+'</tbody></table></div>' +
+    '<div class="prof"><button class="btn-ghost" data-act="toggleProfile">模型眼里的这个人 '+(profileOpen?'▴':'▾')+'</button>' +
+      (profileOpen ? '<div class="card profbody"><p>'+PROFILE+'</p><span class="demo-tag" style="margin-left:0">演示数据，未接入真实模型</span></div>' : '') +
+    '</div>' +
+    '<p class="meta">测试编号 '+st.testId+'｜闲聊封存时间 '+fmt(st.chatSealedAt)+'｜预测完成时间 '+fmt(p.doneAt)+'｜本人提交时间 '+fmt(st.submittedAt)+'｜模型配置：演示｜提示词版本：v0｜商品为示例占位</p>' +
+    '<p class="meta">预测只使用了封存的闲聊文字、商品资料和三档规则，本人选择未进入预测。</p>';
+}
+
+/* ---------- 动作 ---------- */
+function advanceAfterPick(){
+  advTimer = null;
+  if (!st.pendingAdvance) return;
+  st.pendingAdvance = false;
+  if (st.ret === 'overview'){
+    st.ret = null;
+    st.index = 10;
+  } else {
+    st.index = Math.min(st.index + 1, 10);
+  }
+  save();
+  render();
+}
+
+function sealChat(){
+  st.chatSealedAt = Date.now();
+  st.screen = 3;
+  startPred(8000);
+  save();
+  render();
+}
+
+document.addEventListener('input', function(e){
+  if (e.target && e.target.id === 'chatInput'){
+    st.chat = e.target.value;
+    save();
+    updateChatUI();
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('topic')){
+    e.target.click();
+  }
+});
+
+document.addEventListener('click', function(e){
+  const t = e.target.closest ? e.target.closest('[data-act]') : null;
+  if (!t || t.disabled) return;
+  const a = t.getAttribute('data-act');
+
+  switch (a){
+    case 'startChat':
+      st.screen = 2; save(); render(); break;
+
+    case 'topic': {
+      const i = +t.getAttribute('data-i');
+      st.topicsDone[i] = !st.topicsDone[i];
+      t.classList.toggle('done', st.topicsDone[i]);
+      save(); break;
+    }
+
+    case 'fillExample':
+      st.chat = EXAMPLE;
+      $('chatInput').value = EXAMPLE;
+      save(); updateChatUI(); break;
+
+    case 'submitChat':
+      if (chatLen() < 100) return;
+      confirmBox('确认提交这段闲聊？', '提交后不能再改，预测将只使用这段文字。', '再看看', '确认提交', sealChat);
+      break;
+
+    case 'startRate':
+      st.screen = 4;
+      if (st.index > 10) st.index = 0;
+      save(); render(); break;
+
+    case 'pick': {
+      if (st.pendingAdvance) return;
+      const v = t.getAttribute('data-v');
+      st.sel[st.index] = v;
+      st.pendingAdvance = true;
+      save(); render();
+      clearTimeout(advTimer);
+      advTimer = setTimeout(advanceAfterPick, 400);
+      break;
+    }
+
+    case 'prev':
+      if (st.pendingAdvance || st.index <= 0) return;
+      st.index -= 1;
+      save(); render(); break;
+
+    case 'edit':
+      st.index = +t.getAttribute('data-i');
+      st.ret = 'overview';
+      save(); render(); break;
+
+    case 'submitRate':
+      if (firstMissing() !== -1 || st.submittedAt) return;
+      confirmBox('确定提交吗？', '提交后就不能改了，确定吗？', '再看看', '确定提交', function(){
+        st.submittedAt = Date.now();
+        st.screen = 5;
+        st.ret = null;
+        save(); render();
+      });
+      break;
+
+    case 'toggleReveal':
+      st.revealed = !st.revealed;
+      save(); render(); break;
+
+    case 'toggleProfile':
+      profileOpen = !profileOpen; render(); break;
+
+    case 'failPred':
+      clearTimeout(predTimer);
+      if (st.pred){ st.pred.status = 'failed'; save(); }
+      render(); break;
+
+    case 'retryPred':
+      startPred(5000);
+      render(); break;
+
+    case 'reset':
+      confirmBox('确认重新开始？', '当前所有记录都会清空，并生成新的测试编号。', '取消', '确认清空', function(){
+        clearTimeout(predTimer);
+        clearTimeout(advTimer);
+        st = defaultState();
+        profileOpen = false;
+        lastScreen = 0;
+        save(); render();
+      });
+      break;
+  }
+});
+
+/* ---------- 初始化 ---------- */
+save();
+if (st.pred && st.pred.status === 'pending') schedulePred();
+if (st.screen === 4 && st.pendingAdvance){
+  advTimer = setTimeout(advanceAfterPick, 400);
+}
+render();
+})();
+</script>
+
+<style data-madfire-ai-attribution>
+  body {
+    padding-bottom: max(36px, env(safe-area-inset-bottom)) !important;
+  }
+  .madfire-ai-attribution-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2147483647;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    border-top: 1px solid rgba(17, 24, 39, 0.06);
+    background: rgba(255, 255, 255, 0.76);
+    color: #6b7280;
+    font: 500 12px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Yahei', Roboto, 'Helvetica Neue', sans-serif;
+    text-decoration: none;
+    letter-spacing: 0;
+  }
+  .madfire-ai-attribution-bar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 10px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.46));
+  }
+  .madfire-ai-attribution-bar:hover {
+    background: rgba(255, 255, 255, 0.84);
+    color: #374151;
+  }
+  .madfire-ai-attribution-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    vertical-align: -4px;
+    transition: transform 0.2s ease;
+  }
+  .madfire-ai-attribution-bar:hover .madfire-ai-attribution-icon {
+    transform: translateX(3px);
+  }
+  @media (prefers-color-scheme: dark) {
+    .madfire-ai-attribution-bar {
+      border-top-color: rgba(255, 255, 255, 0.08);
+      background: rgba(17, 24, 39, 0.64);
+      color: #d1d5db;
+    }
+    .madfire-ai-attribution-bar::before {
+      background: linear-gradient(to bottom, rgba(17, 24, 39, 0), rgba(17, 24, 39, 0.38));
+    }
+    .madfire-ai-attribution-bar:hover {
+      background: rgba(17, 24, 39, 0.72);
+      color: #ffffff;
+    }
+  }
+</style>
+<a data-madfire-ai-attribution class="madfire-ai-attribution-bar" href="https://madfireai.com" target="_blank" rel="noopener noreferrer">Created by 疯火轮(MadfireAI) | 点击此处，开始你的营销任务<svg class="madfire-ai-attribution-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M5 3l2.5 16.7 3.4-4.4 5.1 3.7L18 17l-5.3-4 4.8-1L5 3z"/></a></body>
+</html>
